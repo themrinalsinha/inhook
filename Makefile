@@ -18,7 +18,7 @@ $(STUFFBIN): # install stuffbin if not present
 	go install github.com/knadh/stuffbin/...
 
 # build the binary with the build string and version if not present
-$(BIN): $(shell find . -type f -name "*.go") go.mod go.sum
+$(BIN): $(shell find . -type f -name "*.go") go.mod
 	@CGO_ENABLED=0 go build \
 		-o ${BIN} \
 		-ldflags="-s -w \
@@ -35,3 +35,21 @@ run:
 			-X 'main.frontendDir=frontend/dist'" \
 		cmd/*.go
 
+.PHONY: build-frontend
+build-frontend:
+	cd frontend && pnpm build
+
+.PHONY: run-frontend
+run-frontend:
+	cd frontend && pnpm install && pnpm run dev
+
+.PHONY: pack-bin
+pack-bin: build-frontend $(BIN) $(STUFFBIN)
+	$(STUFFBIN) -a stuff -in ${BIN} -out ${BIN} ${STATIC}
+
+.PHONY: dist
+dist: $(STUFFBIN) build build-frontend pack-bin
+
+.PHONY: clean
+clean:
+	rm -rf build && rm -rf frontend/dist
