@@ -11,45 +11,73 @@ BIN := build/inhook
 STATIC := frontend/dist:/admin
 
 
-.PHONY: build
-build: $(BIN)
+.PHONY: help build run clean docker-build docker-run dev frontend backend test
 
-$(STUFFBIN): # install stuffbin if not present
-	go install github.com/knadh/stuffbin/...
+help: ## Show this help message
+	@echo 'Usage: make [target]'
+	@echo ''
+	@echo 'Targets:'
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-# build the binary with the build string and version if not present
-$(BIN): $(shell find . -type f -name "*.go") go.mod
-	@CGO_ENABLED=0 go build \
-		-o ${BIN} \
-		-ldflags="-s -w \
-			-X 'main.buildString=${BUILD_STR}' \
-			-X 'main.versionString=${VERSION}'" \
-		cmd/*.go
+build: ## Build the Go backend
+	@echo "Building Go backend..."
+	@cd cmd && go build -o ../bin/inhook main.go
 
-.PHONY: run
-run:
-	@CGO_ENABLED=0 go run \
-		-ldflags="-s -w \
-			-X 'main.buildString=${BUILD_STR}' \
-			-X 'main.versionString=${VERSION}' \
-			-X 'main.frontendDir=frontend/dist'" \
-		cmd/*.go
+run: build ## Build and run the Go backend
+	@echo "Running inHook backend..."
+	@./bin/inhook
 
-.PHONY: build-frontend
-build-frontend:
-	cd frontend && pnpm build
+clean: ## Clean build artifacts
+	@echo "Cleaning build artifacts..."
+	@rm -rf bin/
+	@rm -rf frontend/dist/
 
-.PHONY: run-frontend
-run-frontend:
-	cd frontend && pnpm install && pnpm run dev
+docker-build: ## Build Docker images
+	@echo "Building Docker images..."
+	docker-compose build
 
-.PHONY: pack-bin
-pack-bin: build-frontend $(BIN) $(STUFFBIN)
-	$(STUFFBIN) -a stuff -in ${BIN} -out ${BIN} ${STATIC}
+docker-run: ## Run services with Docker Compose
+	@echo "Starting services with Docker Compose..."
+	docker-compose up
 
-.PHONY: dist
-dist: $(STUFFBIN) build build-frontend pack-bin
+docker-stop: ## Stop Docker services
+	@echo "Stopping Docker services..."
+	docker-compose down
 
-.PHONY: clean
-clean:
-	rm -rf build && rm -rf frontend/dist
+dev: ## Start development environment (backend + frontend)
+	@echo "Starting development environment..."
+	@echo "Backend will run on http://localhost:8080"
+	@echo "Frontend will run on http://localhost:3000"
+	@echo ""
+	@echo "Starting backend..."
+	@cd cmd && go run main.go &
+	@echo "Starting frontend..."
+	@cd frontend && pnpm dev
+
+backend: ## Start only the Go backend
+	@echo "Starting Go backend..."
+	@cd cmd && go run main.go
+
+frontend: ## Start only the Vue frontend
+	@echo "Starting Vue frontend..."
+	@cd frontend && pnpm dev
+
+install-deps: ## Install all dependencies
+	@echo "Installing Go dependencies..."
+	@go mod tidy
+	@echo "Installing frontend dependencies..."
+	@cd frontend && pnpm install
+
+test: ## Run tests
+	@echo "Running Go tests..."
+	@go test ./...
+	@echo "Running frontend tests..."
+	@cd frontend && pnpm test
+
+fmt: ## Format Go code
+	@echo "Formatting Go code..."
+	@go fmt ./...
+
+lint: ## Lint Go code
+	@echo "Linting Go code..."
+	@go vet ./...
