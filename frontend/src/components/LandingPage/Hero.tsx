@@ -11,7 +11,8 @@ export const Hero = () => {
       <p className="text-2xl font-bold text-center text-blue-500 mt-10">
         Free and open source
       </p>
-      <button className="bg-blue-500 text-white px-4 py-2 rounded-full mt-10 hover:bg-blue-700 hover:cursor-pointer">
+      <button className="bg-blue-500 text-white px-4 py-2 rounded-full mt-10 hover:bg-blue-700
+      hover:cursor-pointer transition-all duration-300 ease-in-out">
         Get Started
       </button>
     </div>

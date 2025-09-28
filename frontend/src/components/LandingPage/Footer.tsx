@@ -1,7 +1,7 @@
 export const Footer = ({ version }: { version?: string }) => {
   return (
-    <div className="mx-4 mt-10 fixed bottom-0 min-w-6xl">
-      <div className="flex justify-between items-center py-4 border-t border-t-gray-200">
+    <div className="absolute bottom-0 w-full border-t border-t-neutral-200">
+      <div className="flex justify-between items-center pb-8 m-4">
         <div>
           <p className="text-neutral-500 text-sm">
             © 2025 InHook /{" "}
@@ -16,7 +16,7 @@ export const Footer = ({ version }: { version?: string }) => {
             </a>{" "}
           </p>
           <a
-            className="text-neutral-500 hover:text-blue-500 text-sm"
+            className="text-neutral-500 hover:text-blue-500 text-xs absolute"
             target="_blank"
             rel="noopener"
             href="https://github.com/themrinalsinha/inhook/commits/main/"
