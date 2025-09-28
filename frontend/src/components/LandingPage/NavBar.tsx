@@ -1,13 +1,16 @@
 import appLogo from '../../assets/inhook.png'
 
-const NavBarButton = ({ children }: { children: React.ReactNode }) => {
+const NavBarButton = ({ children, href }: { children: React.ReactNode, href: string }) => {
   return (
-    <button
-      className="text-gray-500 hover:text-blue-700 transition-colors duration-300
+    <a
+      className="text-gray-500 hover:text-blue-500 transition-colors duration-300
       hover:cursor-pointer font-medium"
+      target="_blank"
+      rel="noopener"
+      href={href}
     >
       {children}
-    </button>
+    </a>
   )
 }
 
@@ -20,9 +23,11 @@ export const NavBar = () => {
         className="w-35"
       />
       <div className="flex gap-8 text-gray-500">
-        <NavBarButton>About</NavBarButton>
-        <NavBarButton>Docs</NavBarButton>
-        <NavBarButton>Github</NavBarButton>
+        <NavBarButton href="#">About</NavBarButton>
+        <NavBarButton href="#">Docs</NavBarButton>
+        <NavBarButton href="https://github.com/themrinalsinha/inhook">
+          Github
+        </NavBarButton>
       </div>
     </div>
   );

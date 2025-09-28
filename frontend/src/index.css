@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@theme {
+  --color-blue-thm: rgb(59, 130, 246);
+}
+
 /* default styles */
 * {
   /* border: 1px solid red; */

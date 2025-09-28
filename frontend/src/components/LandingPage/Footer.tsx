@@ -19,7 +19,7 @@ export const Footer = ({ version }: { version?: string }) => {
             className="text-neutral-500 hover:text-blue-500 text-sm"
             target="_blank"
             rel="noopener"
-            href="https://github.com/inhook-io"
+            href="https://github.com/themrinalsinha/inhook/commits/main/"
           >
             {version ? `Version ${version}` : "Version 0.0.1 (development)"}
           </a>
@@ -29,7 +29,7 @@ export const Footer = ({ version }: { version?: string }) => {
           className="text-blue-500 hover:text-blue-600 text-sm"
           target="_blank"
           rel="noopener"
-          href="https://www.buymeacoffee.com/themrinalsinha"
+          href="https://buymeacoffee.com/themrinalsinha"
         >
           ☕ Buy me a coffee
         </a>
