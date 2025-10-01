@@ -1,3 +1,5 @@
+import { Link } from 'react-router'
+
 export const Hero = () => {
   return (
     <div className="flex flex-grow flex-col items-center justify-center py-4 mx-4 mt-20">
@@ -11,10 +13,13 @@ export const Hero = () => {
       <p className="text-2xl font-bold text-center text-blue-500 mt-10">
         Free and open source
       </p>
-      <button className="bg-blue-500 text-white px-4 py-2 rounded-full mt-10 hover:bg-blue-700
-      hover:cursor-pointer transition-all duration-300 ease-in-out">
+      <Link
+        to="/app"
+        className="bg-blue-500 text-white px-4 py-2 rounded-full mt-10 hover:bg-blue-700
+      hover:cursor-pointer transition-all duration-300 ease-in-out"
+      >
         Get Started
-      </button>
+      </Link>
     </div>
   );
 }
