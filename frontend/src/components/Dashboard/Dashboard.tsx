@@ -18,15 +18,19 @@ export const Dashboard = () => {
         <div className="flex flex-row h-full">
           <SidePanel />
           <div className="flex flex-col flex-4">
-            <div className="flex flex-row h-75">
+
+            <div className="flex flex-col">
+              Request Header
+            </div>
+            <div className="flex flex-row h-75 border-b border-b-neutral-200">
               <div className="flex flex-1">
-                Request Details & Headers | Query String
+
               </div>
               <div className="flex flex-1">
-                Response Details & Headers | Query String
+
               </div>
             </div>
-            <div>Request Content</div>
+            <div>Request Body</div>
           </div>
         </div>
     </Container>
