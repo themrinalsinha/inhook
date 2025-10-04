@@ -8,13 +8,16 @@ export const Hero = () => {
     <div className="flex flex-col items-center justify-center mt-20">
       <h1
         className={cn(
-          "py-5 text-6xl font-semibold tracking-tight max-w-2xl text-center",
+          "py-5 md:text-6xl text-4xl font-semibold tracking-tight max-w-2xl text-center",
           "bg-clip-text text-transparent bg-gradient-to-b from-neutral-700 to-neutral-500"
         )}
       >
         Self-hosted webhook inspector and debugger
       </h1>
-      <p className="text-[25px] tracking-normal font-light max-w-2xl text-center text-neutral-400 mt-2">
+      <p className={cn(
+        "md:text-[25px] text-lg tracking-normal font-light max-w-2xl text-center",
+        "text-neutral-400 mt-2"
+      )}>
         A single binary tool to capture, inspect and debug incoming webhooks in
         real time.
       </p>
