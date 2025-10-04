@@ -1,6 +1,7 @@
 import { Link } from 'react-router'
 import { cn } from '../../libs/util';
 import { ChevronRight } from "lucide-react";
+import heroImage from '../../assets/splash.png';
 
 export const Hero = () => {
   return (
@@ -33,6 +34,16 @@ export const Hero = () => {
           <ChevronRight className="w-5 h-5 ml-2" />
         </div>
       </Link>
+      <div className="mt-10 max-w-5xl mx-auto p-2">
+        <img
+          src={heroImage}
+          alt="InHook - Webhook Inspector & Debugger"
+          className={cn(
+            "shadow-sm rounded-lg mb-10 mx-auto w-full outline-1 mask-b-from-75% mask-b-to-95%"
+          )}
+          loading="lazy"
+        />
+      </div>
     </div>
   );
 }

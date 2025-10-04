@@ -2,8 +2,9 @@ import { cn } from "../../libs/util";
 
 export const Footer = () => {
   return (
-    <div className="absolute bottom-0 left-0 right-0 w-full">
-      <div className="max-w-4xl mx-auto p-2">
+    // <div className="absolute w-full bottom-0 left-0 right-0">
+    <div className="w-full mt-auto">
+      <div className="max-w-5xl mx-auto p-2">
         <div className={cn(
           "flex justify-between items-center bg-white rounded-xl p-4",
           "ring-1 ring-blue-100"
@@ -28,7 +29,7 @@ export const Footer = () => {
               rel="noopener"
               href="https://buymeacoffee.com/themrinalsinha"
             >
-              ☕ Buy me a coffee
+              ☕ Donate
             </a>
           </div>
         </div>
