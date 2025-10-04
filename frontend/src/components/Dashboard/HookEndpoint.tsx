@@ -55,6 +55,7 @@ export const HookEndpoint = () => {
           <InputGroupAddon
             align="inline-end"
             className="hover:cursor-pointer hover:text-blue-thm"
+            onClick={() => window.open(webhookUrl, "_blank", "noopener,noreferrer")}
           >
             <SquareArrowOutUpRight className="size-4 text-blue-thm" />
             <span className="lg:block hidden">Open in new tab</span>
