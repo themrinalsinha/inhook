@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { Container } from '../Container'
 import { NavBar } from './NavBar'
-import { SidePanel } from './SidePanel'
+import { HookEndpoint } from './HookEndpoint'
 
 export const Dashboard = () => {
 
@@ -10,9 +10,11 @@ export const Dashboard = () => {
   }, [])
 
   return (
-    <Container>
+    <Container className="h-screen bg-stone-50 mx-auto">
       <NavBar />
-      <SidePanel />
+      <Container className="max-w-7xl mx-auto mt-2">
+        <HookEndpoint />
+      </Container>
     </Container>
   );
 }
