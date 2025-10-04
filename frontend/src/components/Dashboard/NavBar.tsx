@@ -8,7 +8,7 @@ export const NavBar = ({ version }: { version?: string }) => {
     <div
       className={cn(
         "flex justify-between items-center max-w-7xl mx-auto",
-        "p-4 bg-white outline-1 outline-neutral-200 rounded-b-lg"
+        "p-4 bg-white outline-1 outline-neutral-200 rounded-t-lg"
       )}
     >
       <Link to="/app">

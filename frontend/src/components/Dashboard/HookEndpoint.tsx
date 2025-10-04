@@ -17,7 +17,7 @@ import { useState } from "react";
 
 export const HookEndpoint = () => {
   const [copied, setCopied] = useState(false);
-  const webhookUrl = "https://inhook.mrinal.dev/webhook/your-webhook-id"; // Replace with actual URL
+  const webhookUrl = "https://inhook.mrinal.xyz/webhook/your-webhook-id"; // Replace with actual URL
 
   const handleCopy = async () => {
     try {
@@ -30,7 +30,7 @@ export const HookEndpoint = () => {
   };
 
   return (
-    <div className="flex flex-col p-4 gap-2 ">
+    <div className="flex flex-col p-4 pb-6 gap-1 ">
       <Label
         htmlFor="webhook_url"
         className="text-md font-semibold text-neutral-700"

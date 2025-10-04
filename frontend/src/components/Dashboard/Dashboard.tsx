@@ -10,10 +10,10 @@ export const Dashboard = () => {
   }, []);
 
   return (
-    <Container className="h-screen mx-auto bg-neutral-50/50 px-5">
+    <Container className="h-screen mx-auto bg-neutral-50/50 p-5">
       <NavBar />
       <Container className={cn(
-        "max-w-7xl mx-auto mt-5 bg-white rounded-lg outline-1 outline-neutral-200",
+        "max-w-7xl mx-auto bg-white outline-1 outline-neutral-200",
         "divide-y divide-neutral-200"
       )}>
         <HookEndpoint />
