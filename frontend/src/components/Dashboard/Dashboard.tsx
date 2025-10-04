@@ -1,20 +1,24 @@
-import { useEffect } from 'react'
-import { Container } from '../Container'
-import { NavBar } from './NavBar'
-import { HookEndpoint } from './HookEndpoint'
+import { useEffect } from "react";
+import { Container } from "../Container";
+import { NavBar } from "./NavBar";
+import { HookEndpoint } from "./HookEndpoint";
+import { cn } from "@/libs/util";
 
 export const Dashboard = () => {
-
   useEffect(() => {
-    document.title = 'InHook - Dashboard'
-  }, [])
+    document.title = "InHook - Dashboard";
+  }, []);
 
   return (
-    <Container className="h-screen mx-auto bg-neutral-50/20 px-5">
+    <Container className="h-screen mx-auto bg-neutral-50/50 px-5">
       <NavBar />
-      <Container className="max-w-7xl mx-auto mt-5">
+      <Container className={cn(
+        "max-w-7xl mx-auto mt-5 bg-white rounded-lg outline-1 outline-neutral-200",
+        "divide-y divide-neutral-200"
+      )}>
         <HookEndpoint />
+
       </Container>
     </Container>
   );
-}
+};

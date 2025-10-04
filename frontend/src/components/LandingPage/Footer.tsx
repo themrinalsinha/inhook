@@ -5,10 +5,12 @@ export const Footer = () => {
     // <div className="absolute w-full bottom-0 left-0 right-0">
     <div className="w-full mt-auto">
       <div className="max-w-5xl mx-auto p-2">
-        <div className={cn(
-          "flex justify-between items-center bg-white rounded-xl p-4",
-          "ring-1 ring-blue-100"
-        )}>
+        <div
+          className={cn(
+            "flex justify-between items-center bg-white rounded-xl p-4",
+            "ring-1 ring-blue-100"
+          )}
+        >
           <div>
             <p className="text-neutral-500 text-sm">
               © 2025 InHook /{" "}

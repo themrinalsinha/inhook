@@ -1,9 +1,9 @@
-import { cn } from "@/libs/util"
-import appLogo from '../../assets/inhook.png'
+import { cn } from "@/libs/util";
+import appLogo from "../../assets/inhook.png";
 import { GitPullRequest } from "lucide-react";
 import { Link } from "react-router";
 
-export const NavBar = ({version}: {version?: string}) => {
+export const NavBar = ({ version }: { version?: string }) => {
   return (
     <div
       className={cn(
@@ -28,4 +28,4 @@ export const NavBar = ({version}: {version?: string}) => {
       </Link>
     </div>
   );
-}
+};

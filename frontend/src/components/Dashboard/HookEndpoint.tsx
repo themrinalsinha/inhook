@@ -1,6 +1,10 @@
 import { cn } from "@/libs/util";
 import { Button } from "../ui/button";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "../ui/input-group";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "../ui/input-group";
 import { Label } from "../ui/label";
 import {
   Copy,
@@ -21,12 +25,12 @@ export const HookEndpoint = () => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
     } catch (err) {
-      console.error('Failed to copy: ', err);
+      console.error("Failed to copy: ", err);
     }
   };
 
   return (
-    <div className="flex flex-col p-4 gap-2 bg-white rounded-lg outline-1 outline-neutral-200">
+    <div className="flex flex-col p-4 gap-2 ">
       <Label
         htmlFor="webhook_url"
         className="text-md font-semibold text-neutral-700"
@@ -55,7 +59,9 @@ export const HookEndpoint = () => {
           <InputGroupAddon
             align="inline-end"
             className="hover:cursor-pointer hover:text-blue-thm"
-            onClick={() => window.open(webhookUrl, "_blank", "noopener,noreferrer")}
+            onClick={() =>
+              window.open(webhookUrl, "_blank", "noopener,noreferrer")
+            }
           >
             <SquareArrowOutUpRight className="size-4 text-blue-thm" />
             <span className="lg:block hidden">Open in new tab</span>
@@ -90,4 +96,4 @@ export const HookEndpoint = () => {
       </div>
     </div>
   );
-}
+};

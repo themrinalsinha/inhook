@@ -1,23 +1,22 @@
-import { Link } from 'react-router'
-import appLogo from '../../assets/inhook.png'
-import { cn } from '../../libs/util'
+import { Link } from "react-router";
+import appLogo from "../../assets/inhook.png";
+import { cn } from "../../libs/util";
 
 export const NavBar = () => {
-
   const navbarLinks = [
     {
       label: "About",
-      href: "#"
+      href: "#",
     },
     {
       label: "Docs",
-      href: "#"
+      href: "#",
     },
     {
       label: "Github",
-      href: "https://github.com/themrinalsinha/inhook"
-    }
-  ]
+      href: "https://github.com/themrinalsinha/inhook",
+    },
+  ];
 
   return (
     <div
@@ -54,4 +53,4 @@ export const NavBar = () => {
       </div>
     </div>
   );
-}
+};
