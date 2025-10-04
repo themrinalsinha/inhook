@@ -10,9 +10,9 @@ export const Dashboard = () => {
   }, [])
 
   return (
-    <Container className="h-screen bg-stone-50 mx-auto">
+    <Container className="h-screen mx-auto bg-neutral-50/20">
       <NavBar />
-      <Container className="max-w-7xl mx-auto mt-2">
+      <Container className="max-w-7xl mx-auto mt-5">
         <HookEndpoint />
       </Container>
     </Container>

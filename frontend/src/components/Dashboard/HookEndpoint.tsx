@@ -2,7 +2,13 @@ import { cn } from "@/libs/util";
 import { Button } from "../ui/button";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "../ui/input-group";
 import { Label } from "../ui/label";
-import { Copy, RefreshCcw, Webhook, Check } from "lucide-react";
+import {
+  Copy,
+  RefreshCcw,
+  SquareArrowOutUpRight,
+  Check,
+  Link,
+} from "lucide-react";
 import { useState } from "react";
 
 export const HookEndpoint = () => {
@@ -21,15 +27,19 @@ export const HookEndpoint = () => {
 
   return (
     <div className="flex flex-col p-4 gap-2 bg-white rounded-lg outline-1 outline-neutral-200">
-      <Label htmlFor="webhook_url" className="text-sm font-semibold text-neutral-700">
-        Your Webhook Endpoint
+      <Label
+        htmlFor="webhook_url"
+        className="text-md font-semibold text-neutral-700"
+      >
+        Incoming Webhook
       </Label>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col md:flex-row items-center gap-2">
         <InputGroup className="bg-neutral-50 shadow-none">
           <InputGroupAddon align="inline-start">
-            <Webhook />
+            <Link />
+            Your Unique URL
           </InputGroupAddon>
-          <InputGroupAddon align="inline-end">
+          {/* <InputGroupAddon align="inline-end">
             {copied ? (
               <Check className="text-green-500" />
             ) : (
@@ -41,6 +51,13 @@ export const HookEndpoint = () => {
                 onClick={handleCopy}
               />
             )}
+          </InputGroupAddon> */}
+          <InputGroupAddon
+            align="inline-end"
+            className="hover:cursor-pointer hover:text-blue-thm"
+          >
+            <SquareArrowOutUpRight className="size-4 text-blue-thm" />
+            <span className="lg:block hidden">Open in new tab</span>
           </InputGroupAddon>
           <InputGroupInput
             disabled
@@ -48,22 +65,28 @@ export const HookEndpoint = () => {
             id="webhook_url"
             name="webhook_url"
             value={webhookUrl}
+            className="tracking-wider truncate"
             placeholder="Webhook URL"
           />
         </InputGroup>
 
-        {/* <Button variant={"outline"} onClick={handleCopy}>
-          {copied ? <Check className="text-green-500" /> : <Copy />}
-          {copied ? "Copied!" : "Copy"}
-        </Button> */}
-        <Button variant={"outline"} className="text-neutral-700 shadow-none">
-          <RefreshCcw />
-          Refresh Token
-        </Button>
+        <div className="flex md:flex-row items-center gap-2">
+          <Button variant={"outline"} onClick={handleCopy}>
+            {copied ? <Check className="text-green-500" /> : <Copy />}
+            {copied ? "Copied!" : "Copy"}
+          </Button>
+          <Button
+            variant={"outline"}
+            className={cn(
+              "bg-blue-thm/90 text-white shadow-none hover:bg-blue-thm hover:text-white",
+              "transition-colors duration-300"
+            )}
+          >
+            <RefreshCcw />
+            Refresh Token
+          </Button>
+        </div>
       </div>
-      <p className="flex items-center text-[12px] text-neutral-400">
-        Send POST, GET, or any HTTP requests to this endpoint
-      </p>
     </div>
   );
 }
