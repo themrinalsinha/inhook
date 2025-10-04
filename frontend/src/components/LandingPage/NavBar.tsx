@@ -24,7 +24,7 @@ export const NavBar = () => {
       className={cn(
         "flex justify-between items-center bg-neutral-50 rounded-xl p-5",
         "ring-1 shadow-sm shadow-blue-200 ring-blue-100",
-        "sm:max-w-2xl lg:max-w-4xl mx-auto"
+        "max-w-4xl mx-auto"
       )}
     >
       <div>
