@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { cn } from "../../libs/util";
 import { ChevronRight } from "lucide-react";
-import heroImage from "../../assets/splash.png";
+import heroImage from "../../assets/splash2.png";
 import { Circle } from "lucide-react";
 
 export const Hero = () => {
@@ -23,7 +23,7 @@ export const Hero = () => {
       <p
         className={cn(
           "md:text-[25px] text-lg tracking-normal font-light max-w-2xl text-center",
-          "text-neutral-400 mt-2"
+          "text-neutral-500 mt-2"
         )}
       >
         A single binary tool to capture, inspect and debug incoming webhooks in

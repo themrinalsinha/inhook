@@ -10,7 +10,7 @@ export const LandingPage = () => {
   }, []);
 
   return (
-    <Container className="h-screen bg-linear-to-b from-blue-50 to-white px-2 py-5">
+    <Container className="h-full bg-linear-to-b from-blue-100 to-white px-2 py-5">
       <NavBar />
       <Hero />
       <Footer />
