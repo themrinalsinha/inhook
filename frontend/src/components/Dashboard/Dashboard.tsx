@@ -11,7 +11,7 @@ export const Dashboard = () => {
   }, []);
 
   return (
-    <Container className="h-screen mx-auto bg-neutral-50/50 p-5">
+    <Container className="h-screen mx-auto bg-neutral-100 p-5">
       <NavBar />
       <Container
         className={cn(

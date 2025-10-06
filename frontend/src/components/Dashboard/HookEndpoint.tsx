@@ -78,14 +78,19 @@ export const HookEndpoint = () => {
         </InputGroup>
 
         <div className="flex md:flex-row items-center gap-2 text-neutral-700">
-          <Button variant={"outline"} onClick={handleCopy}>
+          <Button
+            className="hover:cursor-pointer"
+            variant={"outline"}
+            onClick={handleCopy}
+          >
             {copied ? <Check className="text-green-500" /> : <Copy />}
             {copied ? "Copied!" : "Copy"}
           </Button>
           <Button
             variant={"outline"}
             className={cn(
-              "bg-blue-thm/90 text-white shadow-none hover:bg-blue-thm hover:text-white",
+              "bg-blue-thm/90 text-white shadow-none",
+              "hover:bg-blue-thm hover:text-white hover:cursor-pointer",
               "transition-colors duration-300"
             )}
           >
