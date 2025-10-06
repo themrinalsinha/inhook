@@ -77,7 +77,7 @@ export const HookEndpoint = () => {
           />
         </InputGroup>
 
-        <div className="flex md:flex-row items-center gap-2">
+        <div className="flex md:flex-row items-center gap-2 text-neutral-700">
           <Button variant={"outline"} onClick={handleCopy}>
             {copied ? <Check className="text-green-500" /> : <Copy />}
             {copied ? "Copied!" : "Copy"}

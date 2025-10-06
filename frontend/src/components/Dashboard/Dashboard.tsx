@@ -3,6 +3,7 @@ import { Container } from "../Container";
 import { NavBar } from "./NavBar";
 import { HookEndpoint } from "./HookEndpoint";
 import { cn } from "@/libs/util";
+import { RequestInfo } from "./RequestInfo";
 
 export const Dashboard = () => {
   useEffect(() => {
@@ -14,11 +15,12 @@ export const Dashboard = () => {
       <NavBar />
       <Container
         className={cn(
-          "max-w-7xl mx-auto bg-white",
-          "border-1 border-neutral-200"
+          "max-w-7xl mx-auto bg-white min-h-[calc(100vh-6rem)]",
+          "border-1 border-neutral-200 rounded-b-lg"
         )}
       >
         <HookEndpoint />
+        <RequestInfo />
       </Container>
     </Container>
   );
