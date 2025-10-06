@@ -1,7 +1,7 @@
 import { cn } from "@/libs/util";
 import { ChevronRight, Plus, Trash, Circle, Pencil } from "lucide-react";
 
-type RequestMethod = "GET" | "POST" | "PATCH" | "DELETE" | "PUT";
+type RequestMethod = "GET" | "POST" | "PATCH" | "DELETE" | "PUT" | "HEAD" | "OPTIONS" | "CONNECT" | "TRACE";
 
 const requestMethods: Record<RequestMethod, {
   bgColor: string;
@@ -32,6 +32,26 @@ const requestMethods: Record<RequestMethod, {
     bgColor: "bg-blue-50",
     textColor: "text-blue-500",
     icon: Pencil,
+  },
+  HEAD: {
+    bgColor: "bg-purple-50",
+    textColor: "text-purple-500",
+    icon: Circle,
+  },
+  OPTIONS: {
+    bgColor: "bg-pink-50",
+    textColor: "text-pink-500",
+    icon: Circle,
+  },
+  CONNECT: {
+    bgColor: "bg-teal-50",
+    textColor: "text-teal-500",
+    icon: Circle,
+  },
+  TRACE: {
+    bgColor: "bg-gray-50",
+    textColor: "text-gray-500",
+    icon: Circle,
   },
 };
 

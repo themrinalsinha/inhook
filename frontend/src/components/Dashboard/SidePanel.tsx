@@ -28,12 +28,10 @@ export const SidePanel = ({ className }: { className?: string }) => {
           <RequestEventNode method="PUT" />
           <RequestEventNode method="PATCH" />
           <RequestEventNode method="DELETE" />
-          <RequestEventNode method="PUT" />
-          <RequestEventNode method="PUT" />
-          <RequestEventNode method="PATCH" />
-          <RequestEventNode method="DELETE" />
-          <RequestEventNode method="PUT" />
-
+          <RequestEventNode method="HEAD" />
+          <RequestEventNode method="OPTIONS" />
+          <RequestEventNode method="CONNECT" />
+          <RequestEventNode method="TRACE" />
         </div>
       </div>
     </div>
