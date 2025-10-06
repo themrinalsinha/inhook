@@ -1,6 +1,6 @@
 import { cn } from "@/libs/util";
 import { Badge } from "../ui/badge";
-import { RequestEventEmptyNode } from "./RequestEventEmptyNode";
+// import { RequestEventEmptyNode } from "./RequestEventEmptyNode";
 import { RequestEventNode } from "./RequestEventNode";
 
 export const SidePanel = ({ className }: { className?: string }) => {
@@ -23,12 +23,17 @@ export const SidePanel = ({ className }: { className?: string }) => {
           }}
         >
           {/* <RequestEventEmptyNode /> */}
-          <RequestEventNode />
-          <RequestEventNode />
-          <RequestEventNode />
-          <RequestEventNode />
-          <RequestEventNode />
-          <RequestEventNode />
+          <RequestEventNode method="GET" />
+          <RequestEventNode method="POST" />
+          <RequestEventNode method="PUT" />
+          <RequestEventNode method="PATCH" />
+          <RequestEventNode method="DELETE" />
+          <RequestEventNode method="PUT" />
+          <RequestEventNode method="PUT" />
+          <RequestEventNode method="PATCH" />
+          <RequestEventNode method="DELETE" />
+          <RequestEventNode method="PUT" />
+
         </div>
       </div>
     </div>
