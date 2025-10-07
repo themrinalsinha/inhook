@@ -1,5 +1,6 @@
 import { cn } from "@/libs/util";
 import { Badge } from "../ui/badge";
+import { RequestDetailBody } from "./RequestDetailBody";
 
 export const RequestDetail = ({ className }: { className?: string }) => {
   return (
@@ -26,7 +27,7 @@ export const RequestDetail = ({ className }: { className?: string }) => {
                 2025-01-01 12:00:00 (a day ago)
               </p>
             </div>
-
+            <RequestDetailBody />
           </div>
         </div>
       </div>
