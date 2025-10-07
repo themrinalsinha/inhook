@@ -65,7 +65,7 @@ export const RequestEventNode = ({ method }: { method: RequestMethod }) => {
           "flex flex-col justify-between h-12 px-1 border-1 border-neutral-200 rounded-sm",
           bgColor,
           "hover:border-neutral-700 hover:border-1 hover:cursor-pointer",
-          "transition-all duration-300"
+          "transition-all duration-300",
         )}
       >
         <div className="flex items-baseline justify-between">

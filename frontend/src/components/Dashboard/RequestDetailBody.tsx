@@ -6,7 +6,7 @@ import { JsonViewer } from "../JsonViewer/JsonViewer";
 const RequestHeader = () => {
   return (
     <RequestBodyContainer>
-      <Table className="w-full text-sm text-neutral-700">
+      <Table className="w-full text-sm text-neutral-500">
         <TableBody>
           <TableRow className="hover:bg-neutral-50">
             <TableHead className="w-1/3">Accept-Language</TableHead>
@@ -109,10 +109,30 @@ const RequestContent = () => {
     longText:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod, nisl eget aliquam ultricies, nunc nisl aliquet nunc, quis aliquam nisl nunc quis nisl. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod, nisl eget aliquam ultricies, nunc nisl aliquet nunc, quis aliquam nisl nunc quis nisl.",
     createdAt: "2025-10-07T03:53:05.167Z",
+    apple: {
+      apple: {
+        apple: {}
+      }
+    },
+    banana: {
+      banana: {
+        banana: {}
+      }
+    },
+    cherry: {
+      cherry: {
+        cherry: {}
+      }
+    },
+    date: new Date(),
   };
 
   return (
     <RequestBodyContainer>
+      {/* Need to update this to be more specific */}
+      <p className="text-sm font-semibold text-neutral-500">
+        Form data
+      </p>
       <JsonViewer data={data} />
     </RequestBodyContainer>
   )

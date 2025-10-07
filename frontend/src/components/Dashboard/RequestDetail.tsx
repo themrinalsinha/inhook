@@ -23,7 +23,7 @@ export const RequestDetail = ({ className }: { className?: string }) => {
               >
                 GET
               </Badge>
-              <p className="text-md font-medium text-neutral-700">
+              <p className="text-md font-normal text-neutral-500">
                 2025-01-01 12:00:00 (a day ago)
               </p>
             </div>
