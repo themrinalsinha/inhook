@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { cn } from "@/libs/util";
 import { ChevronRight } from "lucide-react";
-import heroImage from "@/assets/splash2.png";
+import heroImage from "@/assets/splash.png";
 import { Circle } from "lucide-react";
 
 export const Hero = () => {
