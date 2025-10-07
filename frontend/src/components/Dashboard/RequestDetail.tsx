@@ -1,6 +1,6 @@
 import { cn } from "@/libs/util";
-import { Badge } from "../ui/badge";
-import { RequestDetailBody } from "./RequestDetailBody";
+import { Badge } from "@/components/ui/badge";
+import { RequestDetailBody } from "@/components/Dashboard/RequestDetailBody";
 
 export const RequestDetail = ({ className }: { className?: string }) => {
   return (

@@ -1,5 +1,5 @@
-import { SidePanel } from './SidePanel'
-import { RequestDetail } from './RequestDetail'
+import { SidePanel } from '@/components/Dashboard/SidePanel'
+import { RequestDetail } from '@/components/Dashboard/RequestDetail'
 
 export const RequestInfo = () => {
   return (

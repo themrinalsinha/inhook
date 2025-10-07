@@ -1,11 +1,11 @@
 import { cn } from "@/libs/util";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-} from "../ui/input-group";
-import { Label } from "../ui/label";
+} from "@/components/ui/input-group";
+import { Label } from "@/components/ui/label";
 import {
   Copy,
   RefreshCcw,

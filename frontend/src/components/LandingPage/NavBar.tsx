@@ -1,6 +1,6 @@
 import { Link } from "react-router";
-import appLogo from "../../assets/inhook.png";
-import { cn } from "../../libs/util";
+import appLogo from "@/assets/inhook.png";
+import { cn } from "@/libs/util";
 
 export const NavBar = () => {
   const navbarLinks = [

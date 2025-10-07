@@ -1,4 +1,4 @@
-import { cn } from "../../libs/util";
+import { cn } from "@/libs/util";
 
 export const Footer = () => {
   return (

@@ -1,6 +1,6 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
-import { Table, TableBody, TableCell, TableHead, TableRow } from "../ui/table"
-import { RequestBodyContainer } from "./RequestBodyContainer"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table"
+import { RequestBodyContainer } from "@/components/Dashboard/RequestBodyContainer"
 
 const RequestHeader = () => {
   return (

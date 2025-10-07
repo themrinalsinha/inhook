@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import { Container } from "../Container";
-import { NavBar } from "./NavBar";
-import { HookEndpoint } from "./HookEndpoint";
+import { Container } from "@/components/Container";
+import { NavBar } from "@/components/Dashboard/NavBar";
+import { HookEndpoint } from "@/components/Dashboard/HookEndpoint";
 import { cn } from "@/libs/util";
-import { RequestInfo } from "./RequestInfo";
+import { RequestInfo } from "@/components/Dashboard/RequestInfo";
 
 export const Dashboard = () => {
   useEffect(() => {

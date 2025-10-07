@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { Footer } from "./Footer";
-import { Hero } from "./Hero";
-import { NavBar } from "./NavBar";
-import { Container } from "../Container";
+import { Footer } from "@/components/LandingPage/Footer";
+import { Hero } from "@/components/LandingPage/Hero";
+import { NavBar } from "@/components/LandingPage/NavBar";
+import { Container } from "@/components/Container";
 
 export const LandingPage = () => {
   useEffect(() => {

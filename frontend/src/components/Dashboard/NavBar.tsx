@@ -1,5 +1,5 @@
 import { cn } from "@/libs/util";
-import appLogo from "../../assets/inhook.png";
+import appLogo from "@/assets/inhook.png";
 import { GitPullRequest } from "lucide-react";
 import { Link } from "react-router";
 
