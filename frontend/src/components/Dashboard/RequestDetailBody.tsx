@@ -1,6 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table"
 import { RequestBodyContainer } from "@/components/Dashboard/RequestBodyContainer"
+import { JsonViewer } from "../JsonViewer/JsonViewer";
 
 const RequestHeader = () => {
   return (
@@ -83,9 +84,36 @@ const RequestHeader = () => {
 }
 
 const RequestContent = () => {
+
+  const data = {
+    string: "Hello, world!",
+    number: 42,
+    boolean: true,
+    null: null,
+    object: {
+      nested: {
+        value: "This is nested",
+        array: [1, 2, 3],
+      },
+      empty: {},
+    },
+    array: [
+      "string",
+      123,
+      false,
+      {
+        key: "value",
+      },
+      ["nested", "array"],
+    ],
+    longText:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod, nisl eget aliquam ultricies, nunc nisl aliquet nunc, quis aliquam nisl nunc quis nisl. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod, nisl eget aliquam ultricies, nunc nisl aliquet nunc, quis aliquam nisl nunc quis nisl.",
+    createdAt: "2025-10-07T03:53:05.167Z",
+  };
+
   return (
     <RequestBodyContainer>
-      <p>Content</p>
+      <JsonViewer data={data} />
     </RequestBodyContainer>
   )
 }
