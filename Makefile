@@ -26,7 +26,7 @@ display-version-info:
 	@echo "Build date: $(BUILD_DATE)"
 
 .PHONY: build
-build: $(BIN)
+build-backend: $(BIN)
 
 $(STUFFBIN):
 	go install github.com/knadh/stuffbin/...
@@ -62,3 +62,15 @@ run:
 run-frontend:
 	@cd ${FRONTEND_DIR} && pnpm install
 	@export VITE_APP_VERSION="${APP_VERSION}" && cd ${FRONTEND_DIR} && pnpm dev --host 0.0.0.0
+
+.PHONY: stuff
+stuff: $(STUFFBIN)
+	@echo "Stuffing static files into $(BIN)"
+	@$(STUFFBIN) -a stuff -in ${BIN} -out ${BIN} ${STATIC}
+
+.PHONY: build
+build:
+	@$(MAKE) build-frontend
+	@$(MAKE) build-backend
+	@$(MAKE) stuff
+	@echo "✅ Built $(BIN) version $(APP_VERSION) with hash $(LAST_COMMIT_HASH_FULL)"

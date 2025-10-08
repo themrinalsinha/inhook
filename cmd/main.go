@@ -2,6 +2,9 @@ package main
 
 import (
 	"log"
+	"os"
+
+	"github.com/knadh/stuffbin"
 )
 
 // //go:embed assets/* index.html
@@ -19,4 +22,12 @@ func main() {
 	log.Println("Hash:", buildHash)
 	log.Println("Date:", buildDate)
 	log.Println("Hash Full:", buildHashFull)
+
+	path, err := os.Executable()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Executable path:", path)
+	fs, _ := stuffbin.UnStuff(path)
+	log.Println("Files:", fs.List())
 }
