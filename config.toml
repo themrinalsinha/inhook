@@ -1,0 +1,10 @@
+[app]
+env = "dev"
+log_level = "debug"
+
+[db]
+path = "data"
+name = "inhook.db"
+max_open_conns = 1
+max_idle_conns = 1
+conn_max_lifetime = 3600

@@ -1,33 +1,61 @@
 package main
 
 import (
+	"fmt"
 	"log"
-	"os"
 
+	"github.com/knadh/koanf/v2"
 	"github.com/knadh/stuffbin"
+	"github.com/zerodha/logf"
 )
 
-// //go:embed assets/* index.html
-// var content embed.FS
-
 var (
+	ko      = koanf.New(".")
+	appName = "InHook"
+
+	// data injected at build time
 	buildVersion  string
 	buildHash     string
 	buildDate     string
 	buildHashFull string
 )
 
-func main() {
-	log.Println("Version:", buildVersion)
-	log.Println("Hash:", buildHash)
-	log.Println("Date:", buildDate)
-	log.Println("Hash Full:", buildHashFull)
+// App is the global app context which is passed and injected in the http handlers
+type App struct {
+	fs            stuffbin.FileSystem
+	lo            *logf.Logger
+	buildVersion  string
+	buildHash     string
+	buildDate     string
+	buildHashFull string
+}
 
-	path, err := os.Executable()
+func main() {
+	fmt.Printf("\nBuild Version: %s\n\n", buildVersion)
+
+	// Initialize the config
+	initConfig(ko)
+
+	// Initialize stuffbin file system
+	fs := initFileSystem()
+
+	// Initialize the database
+	_, err := initDB()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error initializing database: %v", err)
 	}
-	log.Println("Executable path:", path)
-	fs, _ := stuffbin.UnStuff(path)
-	log.Println("Files:", fs.List())
+
+	// Initialize the logger
+	lo := initLogger(appName)
+
+	var app = &App{
+		fs:            fs,
+		lo:            lo,
+		buildVersion:  buildVersion,
+		buildHash:     buildHash,
+		buildDate:     buildDate,
+		buildHashFull: buildHashFull,
+	}
+
+	log.Println(app)
 }

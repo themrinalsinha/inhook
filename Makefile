@@ -7,7 +7,7 @@ STUFFBIN ?= $(GOPATH)/bin/stuffbin
 
 BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-BIN := bin/inhook
+BIN := inhook
 
 FRONTEND_DIR := frontend
 FRONTEND_DIST := ${FRONTEND_DIR}/dist
