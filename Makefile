@@ -1,11 +1,10 @@
 LAST_COMMIT_HASH_FULL := $(shell git rev-parse HEAD)
 LAST_COMMIT_HASH_SHORT := $(shell git rev-parse --short HEAD)
+BASE_VERSION := $(shell git describe --tags --abbrev=0 2>/dev/null || echo 0.0.0)
 
 GOPATH ?= $(HOME)/go
 STUFFBIN ?= $(GOPATH)/bin/stuffbin
 
-BASE_VERSION := 0.0.1
-APP_VERSION := $(BASE_VERSION)
 BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 BIN := bin/inhook
@@ -14,9 +13,7 @@ FRONTEND_DIR := frontend
 FRONTEND_DIST := ${FRONTEND_DIR}/dist
 STATIC := ${FRONTEND_DIST}:/
 
-ifeq ($(shell git describe --tags --exact-match 2>/dev/null),)
-	APP_VERSION := v$(APP_VERSION) ($(LAST_COMMIT_HASH_SHORT))
-endif
+APP_VERSION := $(BASE_VERSION) ($(LAST_COMMIT_HASH_SHORT))
 
 .PHONY: display-version-info
 display-version-info:
@@ -61,7 +58,9 @@ run:
 .PHONY: run-frontend
 run-frontend:
 	@cd ${FRONTEND_DIR} && pnpm install
-	@export VITE_APP_VERSION="${APP_VERSION}" && cd ${FRONTEND_DIR} && pnpm dev --host 0.0.0.0
+	@export VITE_APP_VERSION="${APP_VERSION}" \
+		&& cd ${FRONTEND_DIR} \
+		&& pnpm dev --host 0.0.0.0
 
 .PHONY: stuff
 stuff: $(STUFFBIN)
