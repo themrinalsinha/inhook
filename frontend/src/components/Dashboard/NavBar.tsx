@@ -24,7 +24,7 @@ export const NavBar = () => {
         )}
       >
         <GitPullRequest className="size-4.5" />
-        { import.meta.env.VITE_APP_VERSION || "v0.0.0 (development)" }
+        { import.meta.env.VITE_APP_VERSION }
       </Link>
     </div>
   );

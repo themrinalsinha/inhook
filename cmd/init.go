@@ -71,7 +71,24 @@ func initDB() (*sqlx.DB, error) {
 	db.Exec("PRAGMA journal_mode = WAL;")
 	db.Exec("PRAGMA foreign_keys = ON;")
 
+	initMigrations(db)
 	return db, nil
+}
+
+func initMigrations(db *sqlx.DB) {
+	migrations := []string{
+		`
+		CREATE TABLE IF NOT EXISTS users (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			username TEXT NOT NULL,
+			password TEXT NOT NULL
+		);`,
+	}
+
+	for _, migration := range migrations {
+		db.Exec(migration)
+	}
+	log.Println("Migrations applied successfully")
 }
 
 func _getLogLevel(level string) logf.Level {

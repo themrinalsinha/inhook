@@ -40,8 +40,10 @@ $(BIN): $(shell find . -type f -name "*.go") go.mod go.sum
 
 .PHONY: build-frontend
 build-frontend:
-	@export VITE_APP_VERSION="${APP_VERSION}"
-	@cd ${FRONTEND_DIR} && pnpm build
+	@export VITE_APP_VERSION="${APP_VERSION}" \
+		&& cd ${FRONTEND_DIR} \
+		&& pnpm install \
+		&& pnpm build --mode production
 	@echo "✅ Built frontend in ${FRONTEND_DIST}"
 
 .PHONY: run

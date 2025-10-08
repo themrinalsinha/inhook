@@ -1,9 +1,11 @@
 [app]
 env = "dev"
 log_level = "debug"
+host = "http://localhost"
+port = ":9000"
 
 [db]
-path = "data"
+path = "./data/sample/"
 name = "inhook.db"
 max_open_conns = 1
 max_idle_conns = 1

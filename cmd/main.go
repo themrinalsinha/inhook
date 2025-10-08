@@ -32,7 +32,7 @@ type App struct {
 }
 
 func main() {
-	fmt.Printf("\nBuild Version: %s\n\n", buildVersion)
+	fmt.Printf("\n\033[1m%s | Build Version: %s\033[0m\n\n", appName, buildVersion)
 
 	// Initialize the config
 	initConfig(ko)
@@ -58,12 +58,15 @@ func main() {
 		buildHashFull: buildHashFull,
 	}
 
-	log.Println(app)
-
 	// initiate net/http and pass app as context
+	var addr = ko.String("app.host") + ko.String("app.port")
 	server := &http.Server{
-		Addr:    ":8080",
+		Addr:    ko.String("app.port"),
 		Handler: initHandlers(app),
 	}
-	server.ListenAndServe()
+
+	fmt.Printf("\nRunning server on %s\n", addr)
+	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Fatalf("Error running server: %v", err)
+	}
 }
