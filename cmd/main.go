@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/knadh/koanf/v2"
 	"github.com/knadh/stuffbin"
@@ -58,4 +59,11 @@ func main() {
 	}
 
 	log.Println(app)
+
+	// initiate net/http and pass app as context
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: initHandlers(app),
+	}
+	server.ListenAndServe()
 }
