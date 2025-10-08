@@ -3,7 +3,7 @@ import appLogo from "@/assets/inhook.png";
 import { GitPullRequest } from "lucide-react";
 import { Link } from "react-router";
 
-export const NavBar = ({ version }: { version?: string }) => {
+export const NavBar = () => {
   return (
     <div
       className={cn(
@@ -24,7 +24,7 @@ export const NavBar = ({ version }: { version?: string }) => {
         )}
       >
         <GitPullRequest className="size-4.5" />
-        Version {version ? version : "0.1.0 (development)"}
+        { import.meta.env.VITE_APP_VERSION }
       </Link>
     </div>
   );

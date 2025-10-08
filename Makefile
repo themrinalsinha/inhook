@@ -43,10 +43,22 @@ $(BIN): $(shell find . -type f -name "*.go") go.mod go.sum
 
 .PHONY: build-frontend
 build-frontend:
+	@export VITE_APP_VERSION="${APP_VERSION}"
 	@cd ${FRONTEND_DIR} && pnpm build
 	@echo "✅ Built frontend in ${FRONTEND_DIST}"
 
-# .PHONY: build-backend
-# build-backend:
-# 	@$(MAKE) build
-# 	@echo "✅ Built backend in ${BIN}"
+.PHONY: run
+run:
+	@CGO_ENABLED=0 go run \
+		-ldflags="-s -w \
+		-X 'main.buildVersion=$(APP_VERSION)' \
+		-X 'main.buildHash=$(LAST_COMMIT_HASH_SHORT)' \
+		-X 'main.buildDate=$(BUILD_DATE)' \
+		-X 'main.buildHashFull=$(LAST_COMMIT_HASH_FULL)'" \
+		cmd/*.go
+	@echo "✅ Running $(BIN) version $(APP_VERSION)"
+
+.PHONY: run-frontend
+run-frontend:
+	@cd ${FRONTEND_DIR} && pnpm install
+	@export VITE_APP_VERSION="${APP_VERSION}" && cd ${FRONTEND_DIR} && pnpm dev --host 0.0.0.0
