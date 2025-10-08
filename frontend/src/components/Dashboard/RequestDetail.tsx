@@ -1,6 +1,7 @@
 import { cn } from "@/libs/util";
 import MethodBadge from "@/components/Utils/Methods";
 import { RequestDetailBody } from "@/components/Dashboard/RequestDetailBody";
+import moment from "moment";
 
 export const RequestDetail = ({ className }: { className?: string }) => {
   return (
@@ -19,7 +20,12 @@ export const RequestDetail = ({ className }: { className?: string }) => {
             <div className="flex justify-between">
               {MethodBadge.GET.badge}
               <p className="text-sm font-normal text-neutral-500">
-                2025-01-01 12:00:00 (a day ago)
+                {moment("2025-10-01 12:00:00", "YYYY-MM-DD HH:mm:ss").format(
+                  "MMMM Do YYYY, h:mm:ss a"
+                )}{" "}
+                (
+                {moment("2025-10-01 12:00:00", "YYYY-MM-DD HH:mm:ss").fromNow()}
+                )
               </p>
             </div>
             <RequestDetailBody />

@@ -149,7 +149,7 @@ const RequestRaw = () => {
 export const RequestDetailBody = () => {
   return (
     <div>
-      <p className="text-md font-semibold text-neutral-500 mt-5 mb-2">
+      <p className="text-md font-semibold text-neutral-500 mt-2 mb-2">
         Request Preview
       </p>
       <Tabs defaultValue="header">

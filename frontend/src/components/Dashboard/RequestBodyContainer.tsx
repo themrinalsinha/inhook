@@ -9,7 +9,7 @@ export const RequestBodyContainer = ({ children }: { children: React.ReactNode }
       )}
     >
       <div
-        className="p-2 rounded-lg bg-white h-[calc(100vh-416px)] overflow-auto"
+        className="p-2 rounded-lg bg-white h-[calc(100vh-400px)] overflow-auto"
         style={{
           scrollbarWidth: "thin",
           scrollbarColor: "var(--color-neutral-200) var(--color-neutral-50/50)", // thumb color, track color

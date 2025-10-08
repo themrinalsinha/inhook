@@ -17,7 +17,7 @@ import { useState } from "react";
 
 export const HookEndpoint = () => {
   const [copied, setCopied] = useState(false);
-  const webhookUrl = "https://inhook.mrinal.xyz/webhook/your-webhook-id"; // Replace with actual URL
+  const webhookUrl = `${import.meta.env.VITE_API_URL}/webhook/your-webhook-id`; // Replace with actual URL
 
   const handleCopy = async () => {
     try {
