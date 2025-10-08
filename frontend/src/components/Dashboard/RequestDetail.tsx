@@ -1,5 +1,5 @@
 import { cn } from "@/libs/util";
-import { Badge } from "@/components/ui/badge";
+import MethodBadge from "@/components/Utils/Methods";
 import { RequestDetailBody } from "@/components/Dashboard/RequestDetailBody";
 
 export const RequestDetail = ({ className }: { className?: string }) => {
@@ -17,13 +17,8 @@ export const RequestDetail = ({ className }: { className?: string }) => {
         >
           <div className="rounded-lg p-2 h-[calc(100vh-262px)] px-3">
             <div className="flex justify-between">
-              <Badge
-                variant={"default"}
-                className="text-md text-white font-semibold bg-green-500"
-              >
-                GET
-              </Badge>
-              <p className="text-md font-normal text-neutral-500">
+              {MethodBadge.GET.badge}
+              <p className="text-sm font-normal text-neutral-500">
                 2025-01-01 12:00:00 (a day ago)
               </p>
             </div>
