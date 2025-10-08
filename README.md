@@ -3,4 +3,23 @@
 </div>
 
 ----
-**Webhook Inspector & Debugger** - A lightweight, self-hosted application that lets you capture, view, and analyze incoming webhook requests in real time. It provides an interactive interface for inspecting payloads, headers, and delivery details, making it easier to debug integrations and monitor webhook.
+**Webhook Inspector & Debugger** -
+A fast, self-hosted webhook inspector for capturing and analyzing requests in real time - packaged as a single binary.
+
+![](/assets/splash.png)
+Visit [inhook.mrinal.xyz](https://inhook.mrinal.xyz) to explore and use the live version.
+
+## Installation
+
+### Docker
+TBD
+
+### Binary
+- Download the latest release and extract the inhook binary
+- Run ./inhook and visit http://localhost:8080
+
+### Developers
+The backend is written in Go and frontend is in React for the UI.
+
+### License
+TBD
