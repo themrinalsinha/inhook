@@ -1,10 +1,16 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/knadh/koanf/v2"
 	"github.com/knadh/stuffbin"
 	"github.com/zerodha/logf"
@@ -23,6 +29,7 @@ var (
 
 // App is the global app context which is passed and injected in the http handlers
 type App struct {
+	db            *sqlx.DB
 	fs            stuffbin.FileSystem
 	lo            *logf.Logger
 	buildVersion  string
@@ -41,7 +48,7 @@ func main() {
 	fs := initFileSystem()
 
 	// Initialize the database
-	_, err := initDB()
+	db, err := initDB()
 	if err != nil {
 		log.Fatalf("Error initializing database: %v", err)
 	}
@@ -50,6 +57,7 @@ func main() {
 	lo := initLogger(appName)
 
 	var app = &App{
+		db:            db,
 		fs:            fs,
 		lo:            lo,
 		buildVersion:  buildVersion,
@@ -65,8 +73,38 @@ func main() {
 		Handler: initHandlers(app),
 	}
 
-	fmt.Printf("\nRunning server on %s\n", addr)
-	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Fatalf("Error running server: %v", err)
+	// Setup graceful shutdown
+	go func() {
+		fmt.Printf("\nRunning server on - %s\n", addr)
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Error running server: %v", err)
+		}
+	}()
+
+	// Wait for interrupt signal to gracefully shutdown the server
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	log.Println("\n\033[1mShutting down server\033[0m")
+
+	// Create a deadline to wait for shutdown
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// Shutdown the server
+	if err := server.Shutdown(ctx); err != nil {
+		log.Printf("\033[31mServer forced to shutdown: %v\033[0m", err)
+	} else {
+		log.Println("\033[32mServer stopped gracefully\033[0m")
 	}
+
+	// Close the database connection
+	if err := db.Close(); err != nil {
+		log.Printf("\033[31mError closing database: %v\033[0m", err)
+	} else {
+		log.Println("\033[32mDatabase connection closed\033[0m")
+	}
+
+	log.Println("\033[32mServer exited\033[0m")
 }

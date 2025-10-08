@@ -53,13 +53,24 @@ func initFileSystem() stuffbin.FileSystem {
 }
 
 func initDB() (*sqlx.DB, error) {
-	dbPath := ko.String("db.path")
+	dbDir := ko.String("db.path")
 	dbName := ko.String("db.name")
-	dbPath = path.Join(dbPath, dbName)
+	dbFullPath := path.Join(dbDir, dbName)
 
-	log.Println("Initializing database: ", dbPath)
+	// Print the absolute path for clarity
+	absPath, err := os.Getwd()
+	if err != nil {
+		log.Printf("Warning: could not get working directory: %v", err)
+		absPath = ""
+	}
+	log.Printf("Initializing database at: %s (cwd: %s)", dbFullPath, absPath)
 
-	db, err := sqlx.Open("sqlite", dbPath)
+	// Ensure the directory exists
+	if err := os.MkdirAll(dbDir, 0755); err != nil {
+		return nil, fmt.Errorf("could not create db directory %s: %v", dbDir, err)
+	}
+
+	db, err := sqlx.Open("sqlite", dbFullPath)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing database: %v", err)
 	}
