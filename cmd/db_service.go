@@ -145,11 +145,12 @@ func (s *DBService) GetWebhookEventForRequestID(tokenId int64) ([]WebhookEvent, 
 	err := s.db.Select(
 		&events,
 		`SELECT id, token_id, request_id, created_at, method, remote_addr, query_params,
-		headers, form_data, body, raw_data, is_read FROM webhook_event WHERE token_id = ?`,
+		headers, form_data, body, raw_data, is_read FROM webhook_event WHERE token_id = ?
+		ORDER BY created_at DESC LIMIT 50`,
 		tokenId,
 	)
 	if err != nil {
-		return nil, err
+		return []WebhookEvent{}, err
 	}
 	return events, nil
 }
