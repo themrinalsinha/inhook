@@ -1,83 +1,77 @@
-# constants for the build
-LAST_COMMIT := $(or $(shell git rev-parse --short HEAD 2> /dev/null), "unknown")
-VERSION := $(or $(shell git describe --tags --abbrev=0 2> /dev/null), "v0.0.0")
-BUILD_STR := ${VERSION} (\#${LAST_COMMIT} $(shell date -u +"%Y-%m-%dT%H:%M:%S%z"))
+LAST_COMMIT_HASH_FULL := $(shell git rev-parse HEAD)
+LAST_COMMIT_HASH_SHORT := $(shell git rev-parse --short HEAD)
+BASE_VERSION := $(shell git describe --tags --abbrev=0 2>/dev/null || echo 0.0.0)
 
 GOPATH ?= $(HOME)/go
 STUFFBIN ?= $(GOPATH)/bin/stuffbin
 
-BIN := build/inhook
+BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-STATIC := frontend/dist:/admin
+BIN := inhook
 
+FRONTEND_DIR := frontend
+FRONTEND_DIST := ${FRONTEND_DIR}/dist
+STATIC := ${FRONTEND_DIST}:/
 
-.PHONY: help build run clean docker-build docker-run dev frontend backend test
+APP_VERSION := $(BASE_VERSION) ($(LAST_COMMIT_HASH_SHORT))
 
-help: ## Show this help message
-	@echo 'Usage: make [target]'
-	@echo ''
-	@echo 'Targets:'
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+.PHONY: display-version-info
+display-version-info:
+	@echo "Version: $(APP_VERSION)"
+	@echo "Last commit hash: $(LAST_COMMIT_HASH_FULL)"
+	@echo "Last commit hash short: $(LAST_COMMIT_HASH_SHORT)"
+	@echo "Build date: $(BUILD_DATE)"
 
-build: ## Build the Go backend
-	@echo "Building Go backend..."
-	@cd cmd && go build -o ../bin/inhook main.go
+.PHONY: build
+build-backend: $(BIN)
 
-run: build ## Build and run the Go backend
-	@echo "Running inHook backend..."
-	@./bin/inhook
+$(STUFFBIN):
+	go install github.com/knadh/stuffbin/...
 
-clean: ## Clean build artifacts
-	@echo "Cleaning build artifacts..."
-	@rm -rf bin/
-	@rm -rf frontend/dist/
+$(BIN): $(shell find . -type f -name "*.go") go.mod go.sum
+	@CGO_ENABLED=0 go build -o ${BIN} \
+		-ldflags="-s -w \
+		-X 'main.buildVersion=$(APP_VERSION)' \
+		-X 'main.buildHash=$(LAST_COMMIT_HASH_SHORT)' \
+		-X 'main.buildDate=$(BUILD_DATE)' \
+		-X 'main.buildHashFull=$(LAST_COMMIT_HASH_FULL)'" \
+		cmd/*.go
+	@echo "Built $(BIN) version $(APP_VERSION) with hash $(LAST_COMMIT_HASH_FULL)"
 
-docker-build: ## Build Docker images
-	@echo "Building Docker images..."
-	docker-compose build
+.PHONY: build-frontend
+build-frontend:
+	@export VITE_APP_VERSION="${APP_VERSION}" \
+		&& cd ${FRONTEND_DIR} \
+		&& pnpm install \
+		&& pnpm build --mode production
+	@echo "✅ Built frontend in ${FRONTEND_DIST}"
 
-docker-run: ## Run services with Docker Compose
-	@echo "Starting services with Docker Compose..."
-	docker-compose up
+.PHONY: run
+run:
+	@CGO_ENABLED=0 go run \
+		-ldflags="-s -w \
+		-X 'main.buildVersion=$(APP_VERSION)' \
+		-X 'main.buildHash=$(LAST_COMMIT_HASH_SHORT)' \
+		-X 'main.buildDate=$(BUILD_DATE)' \
+		-X 'main.buildHashFull=$(LAST_COMMIT_HASH_FULL)'" \
+		cmd/*.go
+	@echo "✅ Running $(BIN) version $(APP_VERSION)"
 
-docker-stop: ## Stop Docker services
-	@echo "Stopping Docker services..."
-	docker-compose down
+.PHONY: run-frontend
+run-frontend:
+	@cd ${FRONTEND_DIR} && pnpm install
+	@export VITE_APP_VERSION="${APP_VERSION}" \
+		&& cd ${FRONTEND_DIR} \
+		&& pnpm dev --host 0.0.0.0
 
-dev: ## Start development environment (backend + frontend)
-	@echo "Starting development environment..."
-	@echo "Backend will run on http://localhost:8080"
-	@echo "Frontend will run on http://localhost:3000"
-	@echo ""
-	@echo "Starting backend..."
-	@cd cmd && go run main.go &
-	@echo "Starting frontend..."
-	@cd frontend && pnpm dev
+.PHONY: stuff
+stuff: $(STUFFBIN)
+	@echo "Stuffing static files into $(BIN)"
+	@$(STUFFBIN) -a stuff -in ${BIN} -out ${BIN} ${STATIC}
 
-backend: ## Start only the Go backend
-	@echo "Starting Go backend..."
-	@cd cmd && go run main.go
-
-frontend: ## Start only the Vue frontend
-	@echo "Starting Vue frontend..."
-	@cd frontend && pnpm dev
-
-install-deps: ## Install all dependencies
-	@echo "Installing Go dependencies..."
-	@go mod tidy
-	@echo "Installing frontend dependencies..."
-	@cd frontend && pnpm install
-
-test: ## Run tests
-	@echo "Running Go tests..."
-	@go test ./...
-	@echo "Running frontend tests..."
-	@cd frontend && pnpm test
-
-fmt: ## Format Go code
-	@echo "Formatting Go code..."
-	@go fmt ./...
-
-lint: ## Lint Go code
-	@echo "Linting Go code..."
-	@go vet ./...
+.PHONY: build
+build:
+	@$(MAKE) build-frontend
+	@$(MAKE) build-backend
+	@$(MAKE) stuff
+	@echo "✅ Built $(BIN) version $(APP_VERSION) with hash $(LAST_COMMIT_HASH_FULL)"

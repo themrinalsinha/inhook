@@ -1,27 +1,35 @@
+import path from 'path'
 import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import { resolve } from 'path'
+import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { copyFileSync, existsSync } from 'fs'
 
-// https://vitejs.dev/config/
+// Custom plugin to copy favicon.ico to assets directory
+const copyFaviconPlugin = () => {
+  return {
+    name: 'copy-favicon',
+    writeBundle() {
+      const faviconSource = path.resolve(__dirname, 'public/favicon.ico')
+      const faviconDest = path.resolve(__dirname, 'dist/assets/favicon.ico')
+
+      if (existsSync(faviconSource)) {
+        copyFileSync(faviconSource, faviconDest)
+        console.log('✅ favicon.ico copied to assets directory')
+      }
+    }
+  }
+}
+
+// https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    copyFaviconPlugin(),
+  ],
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
-    },
-  },
-  server: {
-    port: 3000,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-      },
-      '/ws': {
-        target: 'ws://localhost:8080',
-        ws: true,
-      },
+      "@": path.resolve(__dirname, "./src"),
     },
   },
 })

@@ -1,260 +1,110 @@
 package main
 
 import (
-	"encoding/json"
+	"context"
+	"fmt"
 	"log"
 	"net/http"
-	"strings"
-	"sync"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
-	"github.com/gorilla/websocket"
+	"github.com/jmoiron/sqlx"
+	"github.com/knadh/koanf/v2"
+	"github.com/knadh/stuffbin"
+	"github.com/zerodha/logf"
 )
 
-// Event represents a captured webhook request
-type Event struct {
-	ID          string            `json:"id"`
-	Method      string            `json:"method"`
-	URL         string            `json:"url"`
-	Headers     map[string]string `json:"headers"`
-	Body        string            `json:"body"`
-	QueryParams map[string]string `json:"queryParams"`
-	IP          string            `json:"ip"`
-	Timestamp   time.Time         `json:"timestamp"`
-	Status      int               `json:"status"`
-}
+var (
+	ko      = koanf.New(".")
+	appName = "InHook"
 
-// WebhookSession represents a webhook endpoint session
-type WebhookSession struct {
-	ID     string  `json:"id"`
-	URL    string  `json:"url"`
-	Events []Event `json:"events"`
-	WS     *websocket.Conn
-}
+	// data injected at build time
+	buildVersion  string
+	buildHash     string
+	buildDate     string
+	buildHashFull string
+)
 
-// App represents the main application
+// App is the global app context which is passed and injected in the http handlers
 type App struct {
-	sessions map[string]*WebhookSession
-	mutex    sync.RWMutex
-	upgrader websocket.Upgrader
-}
-
-// NewApp creates a new application instance
-func NewApp() *App {
-	return &App{
-		sessions: make(map[string]*WebhookSession),
-		upgrader: websocket.Upgrader{
-			CheckOrigin: func(r *http.Request) bool {
-				return true // Allow all origins for development
-			},
-		},
-	}
-}
-
-// CreateSession creates a new webhook session
-func (app *App) CreateSession() *WebhookSession {
-	app.mutex.Lock()
-	defer app.mutex.Unlock()
-
-	id := uuid.New().String()
-	session := &WebhookSession{
-		ID:     id,
-		URL:    "http://localhost:8080/events/" + id,
-		Events: make([]Event, 0),
-	}
-
-	app.sessions[id] = session
-	return session
-}
-
-// GetSession retrieves a webhook session
-func (app *App) GetSession(id string) (*WebhookSession, bool) {
-	app.mutex.RLock()
-	defer app.mutex.RUnlock()
-	session, exists := app.sessions[id]
-	return session, exists
-}
-
-// AddEvent adds an event to a session and notifies WebSocket clients
-func (app *App) AddEvent(sessionID string, event Event) {
-	app.mutex.Lock()
-	defer app.mutex.Unlock()
-
-	if session, exists := app.sessions[sessionID]; exists {
-		session.Events = append(session.Events, event)
-
-		// Notify WebSocket clients
-		if session.WS != nil {
-			eventData, _ := json.Marshal(map[string]interface{}{
-				"type":  "new_event",
-				"event": event,
-			})
-			session.WS.WriteMessage(websocket.TextMessage, eventData)
-		}
-	}
-}
-
-// SetupRoutes configures the application routes
-func (app *App) SetupRoutes(r *gin.Engine) {
-	// CORS middleware
-	r.Use(func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", "*")
-		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(204)
-			return
-		}
-
-		c.Next()
-	})
-
-	// API routes
-	api := r.Group("/api")
-	{
-		// Create new webhook session
-		api.POST("/sessions", func(c *gin.Context) {
-			session := app.CreateSession()
-			c.JSON(http.StatusCreated, session)
-		})
-
-		// Get session events
-		api.GET("/events/:id", func(c *gin.Context) {
-			id := c.Param("id")
-			if session, exists := app.GetSession(id); exists {
-				c.JSON(http.StatusOK, session.Events)
-			} else {
-				c.JSON(http.StatusNotFound, gin.H{"error": "Session not found"})
-			}
-		})
-
-		// Get session info
-		api.GET("/sessions/:id", func(c *gin.Context) {
-			id := c.Param("id")
-			if session, exists := app.GetSession(id); exists {
-				c.JSON(http.StatusOK, session)
-			} else {
-				c.JSON(http.StatusNotFound, gin.H{"error": "Session not found"})
-			}
-		})
-	}
-
-	// WebSocket endpoint
-	r.GET("/ws/:id", func(c *gin.Context) {
-		id := c.Param("id")
-		session, exists := app.GetSession(id)
-		if !exists {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Session not found"})
-			return
-		}
-
-		conn, err := app.upgrader.Upgrade(c.Writer, c.Request, nil)
-		if err != nil {
-			log.Printf("WebSocket upgrade failed: %v", err)
-			return
-		}
-		defer conn.Close()
-
-		// Store WebSocket connection
-		app.mutex.Lock()
-		session.WS = conn
-		app.mutex.Unlock()
-
-		// Send initial events
-		eventsData, _ := json.Marshal(map[string]interface{}{
-			"type":   "initial_events",
-			"events": session.Events,
-		})
-		conn.WriteMessage(websocket.TextMessage, eventsData)
-
-		// Keep connection alive
-		for {
-			_, _, err := conn.ReadMessage()
-			if err != nil {
-				break
-			}
-		}
-	})
-
-	// Webhook endpoint - captures incoming requests
-	r.Any("/events/:id", func(c *gin.Context) {
-		id := c.Param("id")
-		_, exists := app.GetSession(id)
-		if !exists {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Session not found"})
-			return
-		}
-
-		// Read body
-		bodyBytes, _ := c.GetRawData()
-		body := string(bodyBytes)
-
-		// Extract headers
-		headers := make(map[string]string)
-		for key, values := range c.Request.Header {
-			if len(values) > 0 {
-				headers[key] = values[0]
-			}
-		}
-
-		// Extract query parameters
-		queryParams := make(map[string]string)
-		for key, values := range c.Request.URL.Query() {
-			if len(values) > 0 {
-				queryParams[key] = values[0]
-			}
-		}
-
-		// Create event
-		event := Event{
-			ID:          uuid.New().String(),
-			Method:      c.Request.Method,
-			URL:         c.Request.URL.String(),
-			Headers:     headers,
-			Body:        body,
-			QueryParams: queryParams,
-			IP:          c.ClientIP(),
-			Timestamp:   time.Now(),
-			Status:      200,
-		}
-
-		// Add event to session
-		app.AddEvent(id, event)
-
-		// Respond to webhook
-		c.JSON(http.StatusOK, gin.H{"success": true})
-	})
+	db            *sqlx.DB
+	fs            stuffbin.FileSystem
+	lo            *logf.Logger
+	buildVersion  string
+	buildHash     string
+	buildDate     string
+	buildHashFull string
 }
 
 func main() {
-	app := NewApp()
+	fmt.Printf("\n\033[1m%s | Build Version: %s\033[0m\n\n", appName, buildVersion)
 
-	// Create a default session for testing
-	_ = app.CreateSession()
+	// Initialize the config
+	initConfig(ko)
 
-	r := gin.Default()
-	app.SetupRoutes(r)
+	// Initialize stuffbin file system
+	fs := initFileSystem()
 
-	// Serve frontend static files (must be last to avoid conflicts with API routes)
-	r.Static("/assets", "./frontend/dist/assets")
-	r.Static("/favicon.ico", "./frontend/dist/favicon.ico")
-	r.GET("/", func(c *gin.Context) {
-		c.File("./frontend/dist/index.html")
-	})
+	// Initialize the database
+	db, err := initDB()
+	if err != nil {
+		log.Fatalf("Error initializing database: %v", err)
+	}
 
-	// Catch-all for SPA routing - must be last
-	r.NoRoute(func(c *gin.Context) {
-		// Only serve index.html for non-API routes
-		if !strings.HasPrefix(c.Request.URL.Path, "/api") && !strings.HasPrefix(c.Request.URL.Path, "/ws") && !strings.HasPrefix(c.Request.URL.Path, "/events") {
-			c.File("./frontend/dist/index.html")
-		} else {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Not found"})
+	// Initialize the logger
+	lo := initLogger(appName)
+
+	var app = &App{
+		db:            db,
+		fs:            fs,
+		lo:            lo,
+		buildVersion:  buildVersion,
+		buildHash:     buildHash,
+		buildDate:     buildDate,
+		buildHashFull: buildHashFull,
+	}
+
+	// initiate net/http and pass app as context
+	var addr = ko.String("app.host") + ko.String("app.port")
+	server := &http.Server{
+		Addr:    ko.String("app.port"),
+		Handler: initHandlers(app),
+	}
+
+	// Setup graceful shutdown
+	go func() {
+		fmt.Printf("\nRunning server on - %s\n", addr)
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Error running server: %v", err)
 		}
-	})
+	}()
 
-	log.Println("Starting inHook server on :8080")
-	log.Fatal(r.Run(":8080"))
+	// Wait for interrupt signal to gracefully shutdown the server
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	log.Println("\n\033[1mShutting down server\033[0m")
+
+	// Create a deadline to wait for shutdown
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// Shutdown the server
+	if err := server.Shutdown(ctx); err != nil {
+		log.Printf("\033[31mServer forced to shutdown: %v\033[0m", err)
+	} else {
+		log.Println("\033[32mServer stopped gracefully\033[0m")
+	}
+
+	// Close the database connection
+	if err := db.Close(); err != nil {
+		log.Printf("\033[31mError closing database: %v\033[0m", err)
+	} else {
+		log.Println("\033[32mDatabase connection closed\033[0m")
+	}
+
+	log.Println("\033[32mServer exited\033[0m")
 }
