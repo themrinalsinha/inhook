@@ -13,11 +13,44 @@ import {
   Check,
   Link,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import { createWebhookToken, refreshWebhookToken } from "@/api";
+
+interface IWebhookToken {
+  id: number;
+  token: string;
+  created_at: Date;
+}
 
 export const HookEndpoint = () => {
+  const [webhookToken, setWebhookToken] = useState<IWebhookToken | undefined>(
+    undefined
+  );
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  useEffect(() => {
+    const tokenObject = localStorage.getItem("webhook_object");
+    if (tokenObject) {
+      setWebhookToken(JSON.parse(tokenObject));
+    } else {
+      createWebhookToken().then((token) => {
+        setWebhookToken(token);
+        localStorage.setItem("webhook_object", JSON.stringify(token));
+      });
+    }
+  }, [localStorage.getItem("webhook_object")]);
+
+  const handleRefreshToken = async () => {
+    const newToken = await refreshWebhookToken(webhookToken?.token);
+    setWebhookToken(newToken);
+    localStorage.setItem("webhook_object", JSON.stringify(newToken));
+  };
+
   const [copied, setCopied] = useState(false);
-  const webhookUrl = `${import.meta.env.VITE_API_URL}/webhook/your-webhook-id`; // Replace with actual URL
+  const webhookUrl = `${import.meta.env.VITE_API_URL}/api/webhook/${
+    webhookToken?.token
+  }`; // Replace with actual URL
 
   const handleCopy = async () => {
     try {
@@ -93,9 +126,22 @@ export const HookEndpoint = () => {
               "hover:bg-blue-thm hover:text-white hover:cursor-pointer",
               "transition-colors duration-300"
             )}
+            onClick={async () => {
+              setIsRefreshing(true);
+              try {
+                await handleRefreshToken();
+              } finally {
+                setIsRefreshing(false);
+              }
+            }}
+            disabled={isRefreshing}
           >
-            <RefreshCcw />
-            Refresh Token
+            <RefreshCcw
+              className={cn(
+                isRefreshing && "transition-transform duration-300 animate-spin"
+              )}
+            />
+            {isRefreshing ? "Refreshing" : "Refresh Token"}
           </Button>
         </div>
       </div>
