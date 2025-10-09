@@ -1,11 +1,19 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"mime"
 	"net/http"
 	"path/filepath"
+	"time"
 )
+
+type WebhookTokenResponse struct {
+	ID        int64     `json:"id"`
+	Token     string    `json:"token"`
+	CreatedAt time.Time `json:"created_at"`
+}
 
 func rootHandler(app *App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -39,6 +47,57 @@ func staticFilesHandler(app *App) http.HandlerFunc {
 	}
 }
 
+func createWebhookTokenHandler(app *App) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		service := DBService{db: app.db}
+		token, err := service.CreateWebhookToken()
+
+		if err != nil {
+			http.Error(w, "Failed to create webhook token", http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(w).Encode(map[string]string{"token": token})
+		w.WriteHeader(http.StatusCreated)
+	}
+}
+
+func deleteWebhookTokenHandler(app *App) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		token_id := r.PathValue("token_id")
+
+		service := DBService{db: app.db}
+		err := service.DeleteWebhookToken(token_id)
+
+		if err != nil {
+			http.Error(w, "Failed to delete webhook token", http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
+	}
+}
+
+// // Not exposing it for now (not safe to expose till we have user auth in place)
+// func getWebhookTokenHandler(app *App) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		service := DBService{db: app.db}
+// 		tokens, err := service.GetWebhookToken()
+// 		if err != nil {
+// 			http.Error(w, "Failed to get webhook token", http.StatusInternalServerError)
+// 			return
+// 		}
+
+// 		// Convert []WebhookToken to []WebhookTokenResponse
+// 		response := make([]WebhookTokenResponse, len(tokens))
+// 		for i, token := range tokens {
+// 			response[i] = WebhookTokenResponse(token)
+// 		}
+
+// 		w.Header().Set("Content-Type", "application/json")
+// 		json.NewEncoder(w).Encode(response)
+// 		w.WriteHeader(http.StatusOK)
+// 	}
+// }
+
 func initHandlers(app *App) http.Handler {
 	handler := http.NewServeMux()
 	// Static files handlers for serving the frontend
@@ -46,6 +105,8 @@ func initHandlers(app *App) http.Handler {
 	handler.HandleFunc("GET /assets/", staticFilesHandler(app))
 
 	// API handlers for backend
-
+	// handler.HandleFunc("GET /api/webhook/", getWebhookTokenHandler(app))
+	handler.HandleFunc("POST /api/webhook/{$}", createWebhookTokenHandler(app))
+	handler.HandleFunc("DELETE /api/webhook/{token_id}", deleteWebhookTokenHandler(app))
 	return handler
 }
