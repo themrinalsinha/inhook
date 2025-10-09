@@ -24,16 +24,12 @@ export const HookEndpoint = () => {
     webhookToken: IWebhookToken;
     setWebhookToken: (token: IWebhookToken) => void;
   };
+  const [copied, setCopied] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const handleRefreshToken = async () => {
-    const newToken = await refreshWebhookToken(webhookToken?.token);
-    setWebhookToken(newToken);
-    localStorage.setItem("webhook_object", JSON.stringify(newToken));
-  };
-
-  const [copied, setCopied] = useState(false);
-  const webhookUrl = `${import.meta.env.VITE_API_URL}/webhook/${webhookToken?.token}/`;
+  const webhookUrl = `${import.meta.env.VITE_API_URL}/webhook/${
+    webhookToken?.token
+  }/`;
 
   const handleCopy = async () => {
     try {
@@ -42,6 +38,20 @@ export const HookEndpoint = () => {
       setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
     } catch (err) {
       console.error("Failed to copy: ", err);
+    }
+  };
+
+  const handleRefreshToken = async () => {
+    setIsRefreshing(true);
+    try {
+      const newToken = await refreshWebhookToken(webhookToken?.token);
+      setTimeout(() => {
+        setIsRefreshing(false);
+        setWebhookToken(newToken);
+      }, 500);
+      localStorage.setItem("webhook_object", JSON.stringify(newToken));
+    } catch (err) {
+      console.error("Failed to refresh token: ", err);
     }
   };
 
@@ -96,22 +106,15 @@ export const HookEndpoint = () => {
               "hover:bg-blue-thm hover:text-white hover:cursor-pointer",
               "transition-colors duration-300"
             )}
-            onClick={async () => {
-              setIsRefreshing(true);
-              try {
-                await handleRefreshToken();
-              } finally {
-                setIsRefreshing(false);
-              }
-            }}
+            onClick={handleRefreshToken}
             disabled={isRefreshing}
           >
-            <RefreshCcw
-              className={cn(
-                isRefreshing && "transition-transform duration-300 animate-spin"
-              )}
-            />
-            {isRefreshing ? "Refreshing" : "Refresh Token"}
+            {isRefreshing ? (
+              <RefreshCcw className="animate-spin" />
+            ) : (
+              <RefreshCcw />
+            )}
+            {isRefreshing ? "Refreshing Token" : "Refresh Token"}
           </Button>
         </div>
       </div>
