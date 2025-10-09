@@ -75,7 +75,7 @@ func main() {
 
 	// Setup graceful shutdown
 	go func() {
-		fmt.Printf("\nRunning server on - %s\n", addr)
+		fmt.Printf("\nRunning server on - %s\n\n", addr)
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Error running server: %v", err)
 		}

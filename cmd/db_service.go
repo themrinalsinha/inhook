@@ -14,6 +14,21 @@ type WebhookToken struct {
 	CreatedAt time.Time `db:"created_at"`
 }
 
+type WebhookEvent struct {
+	ID          int64     `db:"id"`
+	TokenID     int64     `db:"token_id"`
+	RequestID   string    `db:"request_id"`
+	CreatedAt   time.Time `db:"created_at"`
+	Method      string    `db:"method"`
+	RemoteAddr  string    `db:"remote_addr"`
+	QueryParams string    `db:"query_params"`
+	Headers     string    `db:"headers"`   // json encoded
+	FormData    string    `db:"form_data"` // json encoded
+	Body        string    `db:"body"`      // json encoded
+	RawData     string    `db:"raw_data"`  // json encoded
+	IsRead      bool      `db:"is_read"`
+}
+
 type DBService struct {
 	db *sqlx.DB
 }
@@ -71,6 +86,19 @@ func (s *DBService) DeleteWebhookToken(token string) error {
 	return nil
 }
 
+func (s *DBService) GetWebhookTokenByTokenID(tokenId string) (WebhookToken, error) {
+	var token WebhookToken
+	err := s.db.Get(
+		&token,
+		"SELECT id, token, created_at FROM webhook_token WHERE token = ?",
+		tokenId,
+	)
+	if err != nil {
+		return WebhookToken{}, err
+	}
+	return token, nil
+}
+
 func (s *DBService) GetWebhookToken() ([]WebhookToken, error) {
 	// returns all the tokens with their IDs with WebhookToken object list
 	var tokens []WebhookToken
@@ -79,4 +107,34 @@ func (s *DBService) GetWebhookToken() ([]WebhookToken, error) {
 		return nil, err
 	}
 	return tokens, nil
+}
+
+func (s *DBService) CreateWebhookEvent(event WebhookEvent) (WebhookEvent, error) {
+	// set default values
+	event.RequestID = uuid.NewString()
+
+	result, err := s.db.Exec(
+		`INSERT INTO webhook_event (
+			token_id, request_id, method, remote_addr, query_params, headers,
+			form_data, body, raw_data
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		event.TokenID, event.RequestID, event.Method, event.RemoteAddr,
+		event.QueryParams, event.Headers, event.FormData, event.Body, event.RawData,
+	)
+	if err != nil {
+		return WebhookEvent{}, err
+	}
+
+	var newEvent WebhookEvent
+	lastId, _ := result.LastInsertId()
+	err = s.db.Get(
+		&newEvent,
+		`SELECT id, token_id, request_id, created_at, method, remote_addr, query_params,
+		headers, form_data, body, raw_data, is_read FROM webhook_event WHERE id = ?`,
+		lastId,
+	)
+	if err != nil {
+		return WebhookEvent{}, err
+	}
+	return newEvent, nil
 }

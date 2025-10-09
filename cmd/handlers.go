@@ -6,6 +6,7 @@ import (
 	"log"
 	"mime"
 	"net/http"
+	"net/http/httputil"
 	"path/filepath"
 	"time"
 )
@@ -14,6 +15,21 @@ type WebhookTokenResponse struct {
 	ID        int64     `json:"id"`
 	Token     string    `json:"token"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+type WebhookEventResponse struct {
+	ID          int64     `json:"id"`
+	TokenID     int64     `json:"token_id"`
+	RequestID   string    `json:"request_id"`
+	CreatedAt   time.Time `json:"created_at"`
+	Method      string    `json:"method"`
+	RemoteAddr  string    `json:"remote_addr"`
+	QueryParams string    `json:"query_params"`
+	Headers     string    `json:"headers"`
+	FormData    string    `json:"form_data"`
+	Body        string    `json:"body"`
+	RawData     string    `json:"raw_data"`
+	IsRead      bool      `json:"is_read"`
 }
 
 func rootHandler(app *App) http.HandlerFunc {
@@ -81,19 +97,68 @@ func deleteWebhookTokenHandler(app *App) http.HandlerFunc {
 
 func webhookURLHandler(app *App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		tokenId := r.PathValue("token_id")
-
 		app.lo.Info(fmt.Sprintf("Event Received - [%s] - %s", r.Method, r.URL.Path))
 
+		tokenId := r.PathValue("token_id")
+		service := DBService{db: app.db}
+
+		token, err := service.GetWebhookTokenByTokenID(tokenId)
+		if err != nil {
+			app.lo.Error(
+				fmt.Sprintf("[%d] Invalid token ID: %s", http.StatusBadRequest, err),
+			)
+			return
+		}
+
+		requestDump, err := httputil.DumpRequest(r, false)
+		if err != nil {
+			app.lo.Error(
+				fmt.Sprintf(
+					"[%d] Failed to dump request: %s", http.StatusInternalServerError,
+					err,
+				),
+			)
+			return
+		}
+		headersJSON, _ := json.Marshal(r.Header)
+		queryParamsJSON, _ := json.Marshal(r.URL.Query())
+
+		event := WebhookEvent{
+			TokenID:     token.ID,
+			Method:      r.Method,
+			RemoteAddr:  r.RemoteAddr,
+			Headers:     string(headersJSON),
+			QueryParams: string(queryParamsJSON),
+			RawData:     string(requestDump),
+		}
+		_, err = service.CreateWebhookEvent(event)
+		if err != nil {
+			app.lo.Error(
+				fmt.Sprintf(
+					"[%d] Failed to create webhook event: %s",
+					http.StatusInternalServerError,
+					err,
+				),
+			)
+			return
+		}
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(fmt.Sprintf("[%s] - %s", r.Method, tokenId)))
+		w.Write([]byte(string(requestDump)))
 	}
 }
 
 // Helper function to register a handler for all HTTP methods
 func handleAllMethods(mux *http.ServeMux, pattern string, handler http.HandlerFunc) {
 	methods := []string{
-		"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "CONNECT", "TRACE",
+		http.MethodGet,
+		http.MethodHead,
+		http.MethodPost,
+		http.MethodPut,
+		http.MethodPatch,
+		http.MethodDelete,
+		http.MethodConnect,
+		http.MethodOptions,
+		http.MethodTrace,
 	}
 	for _, method := range methods {
 		mux.HandleFunc(method+" "+pattern, handler)

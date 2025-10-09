@@ -109,7 +109,8 @@ func initMigrations(db *sqlx.DB) {
 			query_params TEXT,
 			headers TEXT,
 			form_data TEXT,
-			body BLOB,
+			body TEXT,
+			raw_data TEXT,
 			is_read BOOLEAN NOT NULL DEFAULT FALSE,
 			UNIQUE(request_id),
 			FOREIGN KEY(token_id) REFERENCES webhook_token(id)
