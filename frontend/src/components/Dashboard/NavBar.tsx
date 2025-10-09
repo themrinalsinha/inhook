@@ -15,7 +15,9 @@ export const NavBar = () => {
         <img src={appLogo} alt="InHook" className="w-25" />
       </Link>
       <Link
-        to="https://github.com/themrinalsinha/inhook"
+        to={`https://github.com/themrinalsinha/inhook/tree/${
+          import.meta.env.VITE_BUILD_COMMIT_HASH
+        }`}
         target="_blank"
         rel="noopener"
         className={cn(
@@ -24,7 +26,7 @@ export const NavBar = () => {
         )}
       >
         <GitPullRequest className="size-4.5" />
-        { import.meta.env.VITE_APP_VERSION }
+        {import.meta.env.VITE_APP_VERSION}
       </Link>
     </div>
   );
