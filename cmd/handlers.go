@@ -82,7 +82,9 @@ func deleteWebhookTokenHandler(app *App) http.HandlerFunc {
 func webhookURLHandler(app *App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tokenId := r.PathValue("token_id")
-		fmt.Println(r.Method, r.URL.Path, tokenId)
+
+		app.lo.Info(fmt.Sprintf("Event Received - [%s] - %s", r.Method, r.URL.Path))
+
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(fmt.Sprintf("[%s] - %s", r.Method, tokenId)))
 	}
