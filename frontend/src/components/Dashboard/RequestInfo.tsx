@@ -26,7 +26,7 @@ export const RequestInfo = () => {
       getWebhookEvents(webhookToken.token).then((events) => {
         setWebhookEvents(events);
       });
-    }, 3000);
+    }, 2000);
 
     // Cleanup interval
     return () => clearInterval(interval);

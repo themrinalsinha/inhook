@@ -12,9 +12,9 @@ export interface IWebhookEvent {
   method: string;
   remote_addr: string;
   query_params: string | null;
-  headers: string | null;
+  headers: string;
   form_data: string | null;
   body: string | null;
-  raw_data: string | null;
+  raw_data: string;
   is_read: boolean;
 }

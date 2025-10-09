@@ -2,86 +2,26 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table"
 import { RequestBodyContainer } from "@/components/Dashboard/RequestBodyContainer"
 import { JsonViewer } from "../JsonViewer/JsonViewer";
+import type { IWebhookEvent } from "@/types/webhook";
 
-const RequestHeader = () => {
+
+const RequestHeader = ({ headers }: { headers: string }) => {
+  const headersObject = JSON.parse(headers);
   return (
     <RequestBodyContainer>
       <Table className="w-full text-sm text-neutral-500">
         <TableBody>
-          <TableRow className="hover:bg-neutral-50">
-            <TableHead className="w-1/3">Accept-Language</TableHead>
-            <TableCell className="w-2/3">
-              fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
-            </TableCell>
-          </TableRow>
-          <TableRow className="hover:bg-neutral-50">
-            <TableHead className="w-1/3">Host</TableHead>
-            <TableCell className="w-2/3">www.example.com</TableCell>
-          </TableRow>
-          <TableRow className="hover:bg-neutral-50">
-            <TableHead className="w-1/3">Accept</TableHead>
-            <TableCell className="w-2/3">application/json</TableCell>
-          </TableRow>
-          <TableRow className="hover:bg-neutral-50">
-            <TableHead className="w-1/3">Accept-Language</TableHead>
-            <TableCell className="w-2/3">
-              fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
-            </TableCell>
-          </TableRow>
-          <TableRow className="hover:bg-neutral-50">
-            <TableHead className="w-1/3">Host</TableHead>
-            <TableCell className="w-2/3">www.example.com</TableCell>
-          </TableRow>
-          <TableRow className="hover:bg-neutral-50">
-            <TableHead className="w-1/3">Accept</TableHead>
-            <TableCell className="w-2/3">application/json</TableCell>
-          </TableRow>
-          <TableRow className="hover:bg-neutral-50">
-            <TableHead className="w-1/3">Accept-Language</TableHead>
-            <TableCell className="w-2/3">
-              fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
-            </TableCell>
-          </TableRow>
-          <TableRow className="hover:bg-neutral-50">
-            <TableHead className="w-1/3">Host</TableHead>
-            <TableCell className="w-2/3">www.example.com</TableCell>
-          </TableRow>
-          <TableRow className="hover:bg-neutral-50">
-            <TableHead className="w-1/3">Accept</TableHead>
-            <TableCell className="w-2/3">application/json</TableCell>
-          </TableRow>
-          <TableRow className="hover:bg-neutral-50">
-            <TableHead className="w-1/3">Accept-Language</TableHead>
-            <TableCell className="w-2/3">
-              fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
-            </TableCell>
-          </TableRow>
-          <TableRow className="hover:bg-neutral-50">
-            <TableHead className="w-1/3">
-              Cross-Origin-Embedder-Policy
-            </TableHead>
-            <TableCell className="w-2/3">unsafe-none</TableCell>
-          </TableRow>
-          <TableRow className="hover:bg-neutral-50">
-            <TableHead className="w-1/3">X-AIRBASE-APP-VERSION</TableHead>
-            <TableCell className="w-2/3">1.0.0</TableCell>
-          </TableRow>
-          <TableRow className="hover:bg-neutral-50">
-            <TableHead className="w-1/3">
-              X-AIRBASE-SHCDN-TOKEN-X-AIRBASE-SHCDN-TOKEN
-            </TableHead>
-            <TableCell className="w-2/3">
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-              Temporibus, velit? Ex, iusto? A reprehenderit consequuntur
-              perferendis unde mollitia. Nobis nam accusamus velit quasi nulla
-              distinctio magni enim molestiae esse nihil.
-            </TableCell>
-          </TableRow>
+          {Object.entries(headersObject).map(([key, value]) => (
+            <TableRow className="hover:bg-neutral-50">
+              <TableHead className="w-1/3">{key}</TableHead>
+              <TableCell className="w-2/3">{value as string}</TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </RequestBodyContainer>
   );
-}
+};
 
 const RequestContent = () => {
 
@@ -138,15 +78,21 @@ const RequestContent = () => {
   )
 }
 
-const RequestRaw = () => {
+const RequestRaw = ({ rawData }: { rawData: string }) => {
   return (
     <RequestBodyContainer>
-      <p>Raw</p>
+      <pre className="text-sm text-neutral-500 whitespace-pre-wrap p-5">
+        {rawData}
+      </pre>
     </RequestBodyContainer>
   )
 }
 
-export const RequestDetailBody = () => {
+export const RequestDetailBody = ({
+  selectedEvent,
+}: {
+  selectedEvent: IWebhookEvent;
+}) => {
   return (
     <div>
       <p className="text-md font-semibold text-neutral-500 mt-2 mb-2">
@@ -154,20 +100,26 @@ export const RequestDetailBody = () => {
       </p>
       <Tabs defaultValue="header">
         <TabsList className="w-full">
-          <TabsTrigger value="header" className="text-neutral-700">Header</TabsTrigger>
-          <TabsTrigger value="content" className="text-neutral-700">Content</TabsTrigger>
-          <TabsTrigger value="raw" className="text-neutral-700">Raw</TabsTrigger>
+          <TabsTrigger value="header" className="text-neutral-700">
+            Header
+          </TabsTrigger>
+          <TabsTrigger value="content" className="text-neutral-700">
+            Content
+          </TabsTrigger>
+          <TabsTrigger value="raw" className="text-neutral-700">
+            Raw
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="header">
-          <RequestHeader />
+          <RequestHeader headers={selectedEvent.headers} />
         </TabsContent>
         <TabsContent value="content">
           <RequestContent />
         </TabsContent>
         <TabsContent value="raw">
-          <RequestRaw />
+          <RequestRaw rawData={selectedEvent.raw_data} />
         </TabsContent>
       </Tabs>
     </div>
-  )
-}
+  );
+};
