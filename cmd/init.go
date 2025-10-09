@@ -87,17 +87,41 @@ func initDB() (*sqlx.DB, error) {
 }
 
 func initMigrations(db *sqlx.DB) {
+	// currently keeping the migrations here, later will move it to a separate file.
 	migrations := []string{
+		// table to store the webhook tokens
 		`
-		CREATE TABLE IF NOT EXISTS users (
+		CREATE TABLE IF NOT EXISTS webhook_token (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			username TEXT NOT NULL,
-			password TEXT NOT NULL
+			token TEXT NOT NULL,
+			created_at DATETIME NOT NULL DEFAULT current_timestamp,
+
+			UNIQUE(token)
 		);`,
+		// table to store the webhook events
+		`CREATE TABLE IF NOT EXISTS webhook_event (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			token_id INTEGER NOT NULL,
+			request_id TEXT NOT NULL,
+			created_at DATETIME NOT NULL DEFAULT current_timestamp,
+			method TEXT NOT NULL,
+			remote_addr TEXT NOT NULL,
+			query_params TEXT,
+			headers TEXT,
+			form_data TEXT,
+			body BLOB,
+			is_read BOOLEAN NOT NULL DEFAULT FALSE,
+			UNIQUE(request_id),
+			FOREIGN KEY(token_id) REFERENCES webhook_token(id)
+		);`,
+		// index to speed up the queries
+		`CREATE INDEX IF NOT EXISTS idx_webhook_events_token_id ON webhook_event(token_id, created_at DESC);`,
 	}
 
 	for _, migration := range migrations {
-		db.Exec(migration)
+		if _, err := db.Exec(migration); err != nil {
+			log.Printf("Error applying migration: %v\nSQL: %s\n", err, migration)
+		}
 	}
 	log.Println("Migrations applied successfully")
 }
