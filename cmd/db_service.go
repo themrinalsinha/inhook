@@ -138,3 +138,18 @@ func (s *DBService) CreateWebhookEvent(event WebhookEvent) (WebhookEvent, error)
 	}
 	return newEvent, nil
 }
+
+func (s *DBService) GetWebhookEventForRequestID(tokenId int64) ([]WebhookEvent, error) {
+	var events []WebhookEvent
+
+	err := s.db.Select(
+		&events,
+		`SELECT id, token_id, request_id, created_at, method, remote_addr, query_params,
+		headers, form_data, body, raw_data, is_read FROM webhook_event WHERE token_id = ?`,
+		tokenId,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return events, nil
+}

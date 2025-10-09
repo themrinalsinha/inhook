@@ -66,6 +66,8 @@ func staticFilesHandler(app *App) http.HandlerFunc {
 
 func createWebhookTokenHandler(app *App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		app.lo.Info("Creating webhook token")
+
 		service := DBService{db: app.db}
 		token, err := service.CreateWebhookToken()
 
@@ -83,6 +85,7 @@ func createWebhookTokenHandler(app *App) http.HandlerFunc {
 func deleteWebhookTokenHandler(app *App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		token_id := r.PathValue("token_id")
+		app.lo.Info(fmt.Sprintf("Deleting webhook token: %s", token_id))
 
 		service := DBService{db: app.db}
 		err := service.DeleteWebhookToken(token_id)
@@ -165,11 +168,39 @@ func handleAllMethods(mux *http.ServeMux, pattern string, handler http.HandlerFu
 	}
 }
 
+func getWebhookEventsHandler(app *App) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tokenId := r.PathValue("token_id")
+		app.lo.Info(fmt.Sprintf("Getting webhook events for token: %s", tokenId))
+
+		service := DBService{db: app.db}
+		token, _ := service.GetWebhookTokenByTokenID(tokenId)
+		events, err := service.GetWebhookEventForRequestID(token.ID)
+		if err != nil {
+			http.Error(w, "Failed to get webhook events", http.StatusInternalServerError)
+			return
+		}
+
+		// Convert to response type with JSON tags
+		response := make([]WebhookEventResponse, len(events))
+		for i, event := range events {
+			response[i] = WebhookEventResponse(event)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(response)
+	}
+}
+
 func initHandlers(app *App) http.Handler {
 	handler := http.NewServeMux()
 
 	handler.HandleFunc("POST /api/webhook/{$}", createWebhookTokenHandler(app))
 	handler.HandleFunc("DELETE /api/webhook/{token_id}", deleteWebhookTokenHandler(app))
+	handler.HandleFunc(
+		"GET /api/webhook/{token_id}/events/", getWebhookEventsHandler(app),
+	)
 
 	// Webhook URL handler - accepts all HTTP methods
 	handleAllMethods(handler, "/webhook/{token_id}/", webhookURLHandler(app))
