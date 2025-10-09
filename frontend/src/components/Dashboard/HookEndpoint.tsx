@@ -48,9 +48,7 @@ export const HookEndpoint = () => {
   };
 
   const [copied, setCopied] = useState(false);
-  const webhookUrl = `${import.meta.env.VITE_API_URL}/api/webhook/${
-    webhookToken?.token
-  }`; // Replace with actual URL
+  const webhookUrl = `${import.meta.env.VITE_API_URL}/webhook/${webhookToken?.token}/`;
 
   const handleCopy = async () => {
     try {
@@ -76,19 +74,6 @@ export const HookEndpoint = () => {
             <Link />
             Your Unique URL
           </InputGroupAddon>
-          {/* <InputGroupAddon align="inline-end">
-            {copied ? (
-              <Check className="text-green-500" />
-            ) : (
-              <Copy
-                className={cn(
-                  "text-neutral-500 hover:cursor-pointer hover:text-neutral-900",
-                  "transition-colors duration-300"
-                )}
-                onClick={handleCopy}
-              />
-            )}
-          </InputGroupAddon> */}
           <InputGroupAddon
             align="inline-end"
             className="hover:cursor-pointer hover:text-blue-thm"

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"mime"
 	"net/http"
@@ -78,33 +79,33 @@ func deleteWebhookTokenHandler(app *App) http.HandlerFunc {
 	}
 }
 
-// // Not exposing it for now (not safe to expose till we have user auth in place)
-// func getWebhookTokenHandler(app *App) http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		service := DBService{db: app.db}
-// 		tokens, err := service.GetWebhookToken()
-// 		if err != nil {
-// 			http.Error(w, "Failed to get webhook token", http.StatusInternalServerError)
-// 			return
-// 		}
+func webhookURLHandler(app *App) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tokenId := r.PathValue("token_id")
+		fmt.Println(r.Method, r.URL.Path, tokenId)
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(fmt.Sprintf("[%s] - %s", r.Method, tokenId)))
+	}
+}
 
-// 		// Convert []WebhookToken to []WebhookTokenResponse
-// 		response := make([]WebhookTokenResponse, len(tokens))
-// 		for i, token := range tokens {
-// 			response[i] = WebhookTokenResponse(token)
-// 		}
-
-// 		w.Header().Set("Content-Type", "application/json")
-// 		json.NewEncoder(w).Encode(response)
-// 		w.WriteHeader(http.StatusOK)
-// 	}
-// }
+// Helper function to register a handler for all HTTP methods
+func handleAllMethods(mux *http.ServeMux, pattern string, handler http.HandlerFunc) {
+	methods := []string{
+		"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "CONNECT", "TRACE",
+	}
+	for _, method := range methods {
+		mux.HandleFunc(method+" "+pattern, handler)
+	}
+}
 
 func initHandlers(app *App) http.Handler {
 	handler := http.NewServeMux()
 
 	handler.HandleFunc("POST /api/webhook/{$}", createWebhookTokenHandler(app))
 	handler.HandleFunc("DELETE /api/webhook/{token_id}", deleteWebhookTokenHandler(app))
+
+	// Webhook URL handler - accepts all HTTP methods
+	handleAllMethods(handler, "/webhook/{token_id}/", webhookURLHandler(app))
 
 	// Static files handlers for serving the frontend
 	handler.HandleFunc("GET /assets/", staticFilesHandler(app))
