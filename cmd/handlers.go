@@ -102,14 +102,13 @@ func deleteWebhookTokenHandler(app *App) http.HandlerFunc {
 
 func initHandlers(app *App) http.Handler {
 	handler := http.NewServeMux()
-	// Static files handlers for serving the frontend
-	handler.HandleFunc("GET /{$}", rootHandler(app))
-	handler.HandleFunc("GET /assets/", staticFilesHandler(app))
 
-	// API handlers for backend
-	// handler.HandleFunc("GET /api/webhook/", getWebhookTokenHandler(app))
 	handler.HandleFunc("POST /api/webhook/{$}", createWebhookTokenHandler(app))
 	handler.HandleFunc("DELETE /api/webhook/{token_id}", deleteWebhookTokenHandler(app))
+
+	// Static files handlers for serving the frontend
+	handler.HandleFunc("GET /assets/", staticFilesHandler(app))
+	handler.HandleFunc("GET /", rootHandler(app))
 
 	return corsMiddleware(handler)
 }
