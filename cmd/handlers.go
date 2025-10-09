@@ -41,7 +41,11 @@ func staticFilesHandler(app *App) http.HandlerFunc {
 
 func initHandlers(app *App) http.Handler {
 	handler := http.NewServeMux()
-	handler.HandleFunc("/", rootHandler(app))
-	handler.HandleFunc("/assets/", staticFilesHandler(app))
+	// Static files handlers for serving the frontend
+	handler.HandleFunc("GET /{$}", rootHandler(app))
+	handler.HandleFunc("GET /assets/", staticFilesHandler(app))
+
+	// API handlers for backend
+
 	return handler
 }
