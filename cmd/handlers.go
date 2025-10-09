@@ -56,8 +56,10 @@ func createWebhookTokenHandler(app *App) http.HandlerFunc {
 			http.Error(w, "Failed to create webhook token", http.StatusInternalServerError)
 			return
 		}
-		json.NewEncoder(w).Encode(WebhookTokenResponse(token))
+
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(WebhookTokenResponse(token))
 	}
 }
 
@@ -108,5 +110,6 @@ func initHandlers(app *App) http.Handler {
 	// handler.HandleFunc("GET /api/webhook/", getWebhookTokenHandler(app))
 	handler.HandleFunc("POST /api/webhook/{$}", createWebhookTokenHandler(app))
 	handler.HandleFunc("DELETE /api/webhook/{token_id}", deleteWebhookTokenHandler(app))
-	return handler
+
+	return corsMiddleware(handler)
 }
