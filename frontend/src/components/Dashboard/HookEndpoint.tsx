@@ -1,3 +1,4 @@
+import { useContext, useState } from "react";
 import { cn } from "@/libs/util";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,33 +14,17 @@ import {
   Check,
   Link,
 } from "lucide-react";
-import { useEffect, useState } from "react";
 
-import { createWebhookToken, refreshWebhookToken } from "@/api";
-
-interface IWebhookToken {
-  id: number;
-  token: string;
-  created_at: Date;
-}
+import { refreshWebhookToken } from "@/api";
+import { inHookContext } from "@/components/Dashboard/Dashboard";
+import type { IWebhookToken } from "@/types/webhook";
 
 export const HookEndpoint = () => {
-  const [webhookToken, setWebhookToken] = useState<IWebhookToken | undefined>(
-    undefined
-  );
+  const { webhookToken, setWebhookToken } = useContext(inHookContext) as {
+    webhookToken: IWebhookToken;
+    setWebhookToken: (token: IWebhookToken) => void;
+  };
   const [isRefreshing, setIsRefreshing] = useState(false);
-
-  useEffect(() => {
-    const tokenObject = localStorage.getItem("webhook_object");
-    if (tokenObject) {
-      setWebhookToken(JSON.parse(tokenObject));
-    } else {
-      createWebhookToken().then((token) => {
-        setWebhookToken(token);
-        localStorage.setItem("webhook_object", JSON.stringify(token));
-      });
-    }
-  }, [localStorage.getItem("webhook_object")]);
 
   const handleRefreshToken = async () => {
     const newToken = await refreshWebhookToken(webhookToken?.token);
