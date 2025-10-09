@@ -40,7 +40,7 @@ $(BIN): $(shell find . -type f -name "*.go") go.mod go.sum
 
 .PHONY: build-frontend
 build-frontend:
-	@export VITE_APP_VERSION="${APP_VERSION}" \
+	@export VITE_APP_VERSION="${APP_VERSION}" VITE_BUILD_COMMIT_HASH="${LAST_COMMIT_HASH_FULL}" \
 		&& cd ${FRONTEND_DIR} \
 		&& pnpm install \
 		&& pnpm build --mode production
@@ -48,6 +48,7 @@ build-frontend:
 
 .PHONY: run
 run:
+	@$(MAKE) build-frontend
 	@CGO_ENABLED=0 go run \
 		-ldflags="-s -w \
 		-X 'main.buildVersion=$(APP_VERSION)' \
@@ -60,7 +61,7 @@ run:
 .PHONY: run-frontend
 run-frontend:
 	@cd ${FRONTEND_DIR} && pnpm install
-	@export VITE_APP_VERSION="${APP_VERSION}" \
+	@export VITE_APP_VERSION="${APP_VERSION}" VITE_BUILD_COMMIT_HASH="${LAST_COMMIT_HASH_FULL}" \
 		&& cd ${FRONTEND_DIR} \
 		&& pnpm dev --host 0.0.0.0
 
