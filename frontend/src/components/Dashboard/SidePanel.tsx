@@ -2,8 +2,19 @@ import { cn } from "@/libs/util";
 import { Badge } from "../ui/badge";
 // import { RequestEventEmptyNode } from "./RequestEventEmptyNode";
 import { RequestEventNode } from "./RequestEventNode";
+import type { IWebhookEvent } from "@/types/webhook";
 
-export const SidePanel = ({ className }: { className?: string }) => {
+export const SidePanel = ({
+  className,
+  webhookEvents,
+  handleSelectEvent,
+}: {
+  className?: string;
+  webhookEvents: IWebhookEvent[];
+  handleSelectEvent: (event: IWebhookEvent) => void;
+}) => {
+  console.log("WEBHOOK EVENTS ---->>> ", webhookEvents)
+  console.log("HANDLE SELECT EVENT ---->>> ", handleSelectEvent)
   return (
     <div className={className}>
       <div className="flex justify-between items-center">

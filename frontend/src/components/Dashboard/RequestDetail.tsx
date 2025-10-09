@@ -2,8 +2,16 @@ import { cn } from "@/libs/util";
 import MethodBadge from "@/components/Utils/Methods";
 import { RequestDetailBody } from "@/components/Dashboard/RequestDetailBody";
 import moment from "moment";
+import type { IWebhookEvent } from "@/types/webhook";
 
-export const RequestDetail = ({ className }: { className?: string }) => {
+export const RequestDetail = ({
+  className,
+  selectedEvent,
+}: {
+  className?: string;
+  selectedEvent: IWebhookEvent | null;
+}) => {
+  console.log("SELECTED EVENT ---->>> ", selectedEvent);
   return (
     <div className={className}>
       <div>
@@ -34,4 +42,4 @@ export const RequestDetail = ({ className }: { className?: string }) => {
       </div>
     </div>
   );
-}
+};
