@@ -1,8 +1,9 @@
 import { cn } from "@/libs/util";
 import { Badge } from "../ui/badge";
-// import { RequestEventEmptyNode } from "./RequestEventEmptyNode";
+import { RequestEventEmptyNode } from "./RequestEventEmptyNode";
 import { RequestEventNode } from "./RequestEventNode";
 import type { IWebhookEvent } from "@/types/webhook";
+import moment from "moment";
 
 export const SidePanel = ({
   className,
@@ -13,16 +14,17 @@ export const SidePanel = ({
   webhookEvents: IWebhookEvent[];
   handleSelectEvent: (event: IWebhookEvent) => void;
 }) => {
-  console.log("WEBHOOK EVENTS ---->>> ", webhookEvents)
-  console.log("HANDLE SELECT EVENT ---->>> ", handleSelectEvent)
   return (
     <div className={className}>
       <div className="flex justify-between items-center">
         <p className="text-md font-semibold text-neutral-700">Recent Events</p>
-        {/* TODO: Don't show badge if there are no events */}
-        <Badge variant="outline" className="text-white bg-blue-thm">
-          Total Events - 100
-        </Badge>
+        {webhookEvents.length === 0 ? (
+          ""
+        ) : (
+          <Badge variant="outline" className="text-white bg-blue-thm">
+            Total Events - {webhookEvents.length}
+          </Badge>
+        )}
       </div>
       <div
         className={cn(
@@ -38,52 +40,19 @@ export const SidePanel = ({
               "var(--color-neutral-200) var(--color-neutral-50/50)", // thumb color, track color
           }}
         >
-          {/* <RequestEventEmptyNode /> */}
-          <RequestEventNode
-            method="GET"
-            eventId="01HXQ2YQK7J8"
-            timestamp="2025-01-01 12:00:00"
-          />
-          <RequestEventNode
-            method="POST"
-            eventId="01HXQ2YQK7J8"
-            timestamp="2025-01-01 12:00:00"
-          />
-          <RequestEventNode
-            method="PUT"
-            eventId="01HXQ2YQK7J8"
-            timestamp="2025-01-01 12:00:00"
-          />
-          <RequestEventNode
-            method="PATCH"
-            eventId="01HXQ2YQK7J8"
-            timestamp="2025-01-01 12:00:00"
-          />
-          <RequestEventNode
-            method="DELETE"
-            eventId="01HXQ2YQK7J8"
-            timestamp="2025-01-01 12:00:00"
-          />
-          <RequestEventNode
-            method="HEAD"
-            eventId="01HXQ2YQK7J8"
-            timestamp="2025-01-01 12:00:00"
-          />
-          <RequestEventNode
-            method="OPTIONS"
-            eventId="01HXQ2YQK7J8"
-            timestamp="2025-01-01 12:00:00"
-          />
-          <RequestEventNode
-            method="CONNECT"
-            eventId="01HXQ2YQK7J8"
-            timestamp="2025-01-01 12:00:00"
-          />
-          <RequestEventNode
-            method="TRACE"
-            eventId="01HXQ2YQK7J8"
-            timestamp="2025-01-01 12:00:00"
-          />
+          {webhookEvents.length === 0 ? (
+            <RequestEventEmptyNode />
+          ) : (
+            webhookEvents.map((event) => (
+              <RequestEventNode
+                key={event.id}
+                method={event.method}
+                eventId={event.request_id.slice(0, 8)}
+                timestamp={moment(event.created_at).fromNow()}
+                handleSelectEvent={handleSelectEvent}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>

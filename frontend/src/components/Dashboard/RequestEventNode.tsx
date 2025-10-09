@@ -1,18 +1,21 @@
 import { cn } from "@/libs/util";
 import { ChevronRight } from "lucide-react";
 import MethodBadge from "@/components/Utils/Methods";
+import type { IWebhookEvent } from "@/types/webhook";
 
 export const RequestEventNode = ({
   method,
   eventId,
   timestamp,
+  handleSelectEvent,
 }: {
   method: string;
   eventId: string;
   timestamp: string;
+  handleSelectEvent: (event: IWebhookEvent) => void;
 }) => {
   const { bgColor, textColor, icon: Icon } = MethodBadge[method];
-
+  console.log("HANDLE SELECT EVENT ---->>> ", handleSelectEvent)
   return (
     <div>
       <div

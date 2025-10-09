@@ -14,11 +14,22 @@ export const RequestInfo = () => {
   const [webhookEvents, setWebhookEvents] = useState<IWebhookEvent[]>([]);
 
   useEffect(() => {
-    getWebhookEvents(webhookToken?.token).then((events) => {
+    if (!webhookToken?.token) return;
+
+    // Initial fetch
+    getWebhookEvents(webhookToken.token).then((events) => {
       setWebhookEvents(events);
-      console.log("FETCHING EVENTS ---->>> ", events)
-      console.log("WEBHOOK TOKEN ---->>> ", webhookToken?.token)
     });
+
+    // Polling interval
+    const interval = setInterval(() => {
+      getWebhookEvents(webhookToken.token).then((events) => {
+        setWebhookEvents(events);
+      });
+    }, 2000);
+
+    // Cleanup interval
+    return () => clearInterval(interval);
   }, [webhookToken?.token]);
 
   const [selectedEvent, setSelectedEvent] = useState<IWebhookEvent | null>(null);
