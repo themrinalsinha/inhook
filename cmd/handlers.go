@@ -56,7 +56,7 @@ func createWebhookTokenHandler(app *App) http.HandlerFunc {
 			http.Error(w, "Failed to create webhook token", http.StatusInternalServerError)
 			return
 		}
-		json.NewEncoder(w).Encode(map[string]string{"token": token})
+		json.NewEncoder(w).Encode(WebhookTokenResponse(token))
 		w.WriteHeader(http.StatusCreated)
 	}
 }

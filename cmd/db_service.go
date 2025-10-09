@@ -18,13 +18,20 @@ type DBService struct {
 	db *sqlx.DB
 }
 
-func (s *DBService) CreateWebhookToken() (string, error) {
+func (s *DBService) CreateWebhookToken() (WebhookToken, error) {
 	var newToken = uuid.NewString()[:8]
-	_, err := s.db.Exec("INSERT INTO webhook_token (token) VALUES (?)", newToken)
+	var token WebhookToken
+
+	result, err := s.db.Exec("INSERT INTO webhook_token (token) VALUES (?)", newToken)
 	if err != nil {
-		return "", err
+		return WebhookToken{}, err
 	}
-	return newToken, nil
+	lastId, _ := result.LastInsertId()
+	err = s.db.Get(&token, "SELECT id, token, created_at FROM webhook_token WHERE id = ?", lastId)
+	if err != nil {
+		return WebhookToken{}, err
+	}
+	return token, nil
 }
 
 func (s *DBService) DeleteWebhookToken(token string) error {
