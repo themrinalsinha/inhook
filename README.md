@@ -16,7 +16,7 @@ TBD
 
 ### Binary
 - Download the latest release and extract the inhook binary
-- Run ./inhook and visit http://localhost:8080
+- Run ./inhook and visit http://localhost:9000
 
 ### Developers
 The backend is written in Go and frontend is in React for the UI.
