@@ -3,7 +3,6 @@ import { Badge } from "../ui/badge";
 import { RequestEventEmptyNode } from "./RequestEventEmptyNode";
 import { RequestEventNode } from "./RequestEventNode";
 import type { IWebhookEvent } from "@/types/webhook";
-import moment from "moment";
 
 export const SidePanel = ({
   className,
@@ -45,10 +44,8 @@ export const SidePanel = ({
           ) : (
             webhookEvents.map((event) => (
               <RequestEventNode
+                event={event}
                 key={event.id}
-                method={event.method}
-                eventId={event.request_id.slice(0, 8)}
-                timestamp={moment(event.created_at).fromNow()}
                 handleSelectEvent={handleSelectEvent}
               />
             ))

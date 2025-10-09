@@ -16,7 +16,7 @@ export const RequestDetail = ({
     <div className={className}>
       <div>
         <p className="text-md font-semibold text-neutral-700">
-          Request Details
+          Request Details - {selectedEvent?.request_id.slice(0, 8)}
         </p>
         <div
           className={cn(
