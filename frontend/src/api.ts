@@ -1,10 +1,6 @@
 import axios from "axios";
+import type { IWebhookToken, IWebhookEvent } from "@/types/webhook";
 
-interface IWebhookToken {
-  id: number;
-  token: string;
-  created_at: Date;
-}
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:9000",
@@ -33,4 +29,12 @@ export const refreshWebhookToken = async (tokenId?: string) => {
   }
   const response = await createWebhookToken();
   return response;
+}
+
+export const getWebhookEvents = async (tokenId: string) => {
+  const response = await api.get(`/api/webhook/${tokenId}/events/`);
+  if (response.status !== 200) {
+    throw new Error("Failed to get webhook events");
+  }
+  return response.data as IWebhookEvent[];
 }
