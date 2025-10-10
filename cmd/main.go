@@ -39,7 +39,15 @@ type App struct {
 }
 
 func main() {
-	fmt.Printf("\n\033[1m%s | Build Version: %s\033[0m\n\n", appName, buildVersion)
+	// Load command line arguments
+	initFlags()
+
+	if ko.Bool("version") {
+		fmt.Printf("\n\033[1m%s | Build Version: %s\033[0m\n\n", appName, buildVersion)
+		os.Exit(0)
+	} else {
+		fmt.Printf("\n\033[1m%s | Build Version: %s\033[0m\n\n", appName, buildVersion)
+	}
 
 	// Initialize the config
 	initConfig(ko)

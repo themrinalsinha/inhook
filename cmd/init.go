@@ -10,8 +10,10 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/knadh/koanf/parsers/toml"
 	"github.com/knadh/koanf/providers/file"
+	"github.com/knadh/koanf/providers/posflag"
 	"github.com/knadh/koanf/v2"
 	"github.com/knadh/stuffbin"
+	flag "github.com/spf13/pflag"
 	"github.com/zerodha/logf"
 	_ "modernc.org/sqlite"
 )
@@ -25,6 +27,26 @@ func initConfig(ko *koanf.Koanf) {
 		} else {
 			log.Fatalf("Error loading config file: %v", err)
 		}
+	}
+}
+
+func initFlags() {
+	f := flag.NewFlagSet("config", flag.ContinueOnError)
+
+	// Registering --help handler
+	f.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+		f.PrintDefaults()
+	}
+	f.Bool("version", false, "Show current version of the build")
+	f.StringSlice(
+		"config", []string{"config.toml"}, "path to config files (could be multiple)",
+	)
+	if err := f.Parse(os.Args[1:]); err != nil {
+		log.Fatalf("Error parsing flags: %v", err)
+	}
+	if err := ko.Load(posflag.Provider(f, ".", ko), nil); err != nil {
+		log.Fatalf("Error loading config from flags: %v", err)
 	}
 }
 
