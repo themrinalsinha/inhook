@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
-import { Badge } from "../ui/badge";
-import { RequestEventEmptyNode } from "./RequestEventEmptyNode";
-import { RequestEventNode } from "./RequestEventNode";
+import { Badge } from "@/components/ui/badge";
+import { RequestEventEmptyNode } from "@/components/Dashboard/RequestEventEmptyNode";
+import { RequestEventNode } from "@/components/Dashboard/RequestEventNode";
 import type { IWebhookEvent } from "@/types/webhook";
 
 export const SidePanel = ({

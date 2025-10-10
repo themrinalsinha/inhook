@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table"
 import { RequestBodyContainer } from "@/components/Dashboard/RequestBodyContainer"
-import { JsonViewer } from "../JsonViewer/JsonViewer";
+import { JsonViewer } from "@/components/JsonViewer/JsonViewer";
 import type { IWebhookEvent } from "@/types/webhook";
 
 
