@@ -18,3 +18,9 @@ export interface IWebhookEvent {
   raw_data: string;
   is_read: boolean;
 }
+
+export interface IWebhookConfig {
+  name: string;
+  version: string;
+  host: string;
+}

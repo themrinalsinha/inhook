@@ -67,7 +67,6 @@ func main() {
 	}
 
 	// initiate net/http and pass app as context
-	var addr = ko.String("app.host") + ko.String("app.port")
 	server := &http.Server{
 		Addr:    ko.String("app.port"),
 		Handler: initHandlers(app),
@@ -75,7 +74,7 @@ func main() {
 
 	// Setup graceful shutdown
 	go func() {
-		fmt.Printf("\nRunning server on - %s\n\n", addr)
+		fmt.Printf("\nRunning server on - %s\n\n", ko.String("app.host"))
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Error running server: %v", err)
 		}

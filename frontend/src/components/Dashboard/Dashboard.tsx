@@ -4,13 +4,16 @@ import { NavBar } from "@/components/Dashboard/NavBar";
 import { HookEndpoint } from "@/components/Dashboard/HookEndpoint";
 import { cn } from "@/lib/utils";
 import { RequestInfo } from "@/components/Dashboard/RequestInfo";
-import type { IWebhookToken } from "@/types/webhook";
-import { createWebhookToken } from "@/api";
+import type { IWebhookToken, IWebhookConfig } from "@/types/webhook";
+import { createWebhookToken, getWebhookConfig } from "@/api";
 
 export const inHookContext = createContext({});
 
 export const Dashboard = () => {
   const [webhookToken, setWebhookToken] = useState<IWebhookToken | undefined>(
+    undefined
+  );
+  const [webhookConfig, setWebhookConfig] = useState<IWebhookConfig | undefined>(
     undefined
   );
 
@@ -28,12 +31,20 @@ export const Dashboard = () => {
     }
   }, [localStorage.getItem("webhook_object")]);
 
+  useEffect(() => {
+    getWebhookConfig().then((config) => {
+      console.log(config);
+      setWebhookConfig(config);
+    });
+  }, []);
+
   return (
     <Container className="h-screen mx-auto bg-neutral-100 p-5">
       <inHookContext.Provider
         value={{
           webhookToken,
           setWebhookToken,
+          webhookConfig,
         }}
       >
         <NavBar />

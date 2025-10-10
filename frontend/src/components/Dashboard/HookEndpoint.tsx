@@ -17,19 +17,22 @@ import {
 
 import { refreshWebhookToken } from "@/api";
 import { inHookContext } from "@/components/Dashboard/Dashboard";
-import type { IWebhookToken } from "@/types/webhook";
+import type { IWebhookToken, IWebhookConfig } from "@/types/webhook";
 
 export const HookEndpoint = () => {
-  const { webhookToken, setWebhookToken } = useContext(inHookContext) as {
+  const { webhookToken, setWebhookToken, webhookConfig } = useContext(
+    inHookContext
+  ) as {
     webhookToken: IWebhookToken;
     setWebhookToken: (token: IWebhookToken) => void;
+    webhookConfig: IWebhookConfig;
   };
   const [copied, setCopied] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const webhookUrl = `${import.meta.env.VITE_API_URL}/webhook/${
-    webhookToken?.token
-  }/`;
+  const webhookUrl = `${
+    webhookConfig?.host || import.meta.env.VITE_API_URL
+  }/webhook/${webhookToken?.token}/`;
 
   const handleCopy = async () => {
     try {
