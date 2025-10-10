@@ -1,7 +1,7 @@
 [app]
 env = "dev"
 log_level = "debug"
-host = "http://localhost"
+host = "http://inhook.localhost"
 port = ":9000"
 
 [db]

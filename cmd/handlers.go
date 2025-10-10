@@ -193,6 +193,19 @@ func getWebhookEventsHandler(app *App) http.HandlerFunc {
 	}
 }
 
+func getWebhookConfigHandler(app *App) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		app.lo.Info("Getting webhook config")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]string{
+			"name":    "InHook",
+			"version": app.buildVersion,
+			"host":    ko.String("app.host"),
+		})
+	}
+}
+
 func initHandlers(app *App) http.Handler {
 	handler := http.NewServeMux()
 
@@ -201,6 +214,7 @@ func initHandlers(app *App) http.Handler {
 	handler.HandleFunc(
 		"GET /api/webhook/{token_id}/events/", getWebhookEventsHandler(app),
 	)
+	handler.HandleFunc("GET /api/webhook/config/{$}", getWebhookConfigHandler(app))
 
 	// Webhook URL handler - accepts all HTTP methods
 	handleAllMethods(handler, "/webhook/{token_id}/", webhookURLHandler(app))
