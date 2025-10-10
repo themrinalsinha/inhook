@@ -199,7 +199,7 @@ func getWebhookConfigHandler(app *App) http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]string{
-			"name":    "InHook",
+			"name":    appName,
 			"version": app.buildVersion,
 			"host":    ko.String("app.host"),
 		})

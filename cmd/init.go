@@ -20,12 +20,14 @@ import (
 
 // initConfig loads the config files into the koanf instance
 func initConfig(ko *koanf.Koanf) {
-	log.Println("Loading config file: ", "config.toml")
-	if err := ko.Load(file.Provider("config.toml"), toml.Parser()); err != nil {
-		if os.IsNotExist(err) {
-			log.Fatal("Config file not found: ", "config.toml")
-		} else {
-			log.Fatalf("Error loading config file: %v", err)
+	for _, f := range ko.Strings("config") {
+		log.Println("Loading config file(s)")
+		if err := ko.Load(file.Provider(f), toml.Parser()); err != nil {
+			if os.IsNotExist(err) {
+				log.Fatal("Config file not found: ", f)
+			} else {
+				log.Fatalf("Error loading config file: %v", err)
+			}
 		}
 	}
 }
