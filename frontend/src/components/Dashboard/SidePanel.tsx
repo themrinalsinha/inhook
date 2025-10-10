@@ -1,4 +1,4 @@
-import { cn } from "@/libs/util";
+import { cn } from "@/lib/utils";
 import { Badge } from "../ui/badge";
 import { RequestEventEmptyNode } from "./RequestEventEmptyNode";
 import { RequestEventNode } from "./RequestEventNode";

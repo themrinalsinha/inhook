@@ -1,4 +1,4 @@
-import { cn } from "@/libs/util";
+import { cn } from "@/lib/utils";
 import { ChevronRight } from "lucide-react";
 import MethodBadge from "@/components/Utils/Methods";
 import type { IWebhookEvent } from "@/types/webhook";

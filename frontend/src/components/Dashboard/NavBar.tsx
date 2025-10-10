@@ -1,4 +1,4 @@
-import { cn } from "@/libs/util";
+import { cn } from "@/lib/utils";
 import appLogo from "@/assets/inhook.png";
 import { GitPullRequest } from "lucide-react";
 import { Link } from "react-router";

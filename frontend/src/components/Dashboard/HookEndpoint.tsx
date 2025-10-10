@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { cn } from "@/libs/util";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   InputGroup,

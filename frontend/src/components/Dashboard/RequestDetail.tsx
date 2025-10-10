@@ -1,4 +1,4 @@
-import { cn } from "@/libs/util";
+import { cn } from "@/lib/utils";
 import MethodBadge from "@/components/Utils/Methods";
 import { RequestDetailBody } from "@/components/Dashboard/RequestDetailBody";
 import moment from "moment";

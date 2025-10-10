@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { cn } from "@/libs/util";
+import { cn } from "@/lib/utils";
 import { ChevronRight } from "lucide-react";
 import heroImage from "@/assets/splash.png";
 import { Circle } from "lucide-react";

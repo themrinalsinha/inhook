@@ -2,7 +2,7 @@ import { createContext, useEffect, useState } from "react";
 import { Container } from "@/components/Container";
 import { NavBar } from "@/components/Dashboard/NavBar";
 import { HookEndpoint } from "@/components/Dashboard/HookEndpoint";
-import { cn } from "@/libs/util";
+import { cn } from "@/lib/utils";
 import { RequestInfo } from "@/components/Dashboard/RequestInfo";
 import type { IWebhookToken } from "@/types/webhook";
 import { createWebhookToken } from "@/api";
