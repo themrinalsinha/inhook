@@ -1,0 +1,16 @@
+[Unit]
+Description=inhook service
+After=network.target
+Wants=network-online.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/srv/inhook
+ExecStart=/srv/inhook/inhook
+ExecStart=/srv/inhook/inhook --config /srv/inhook/config.toml
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
