@@ -2,7 +2,7 @@ import { Link } from "react-router";
 import { cn } from "@/lib/utils";
 import { ChevronRight } from "lucide-react";
 import heroImage from "@/assets/splash.png";
-import { Circle } from "lucide-react";
+// import { Circle } from "lucide-react";
 
 export const Hero = () => {
   return (
@@ -14,16 +14,16 @@ export const Hero = () => {
           "bg-clip-text text-transparent bg-gradient-to-b from-neutral-700 to-neutral-500"
         )}
       >
-        <Circle
+        {/* <Circle
           className="absolute -top-2 right-0 size-10 animate-pulse stroke-blue-thm/20"
           strokeWidth={3}
-        />
+        /> */}
         Self-hosted webhook inspector and debugger
       </h1>
       <p
         className={cn(
-          "md:text-[25px] text-lg tracking-normal font-light max-w-2xl text-center",
-          "text-neutral-500 mt-2"
+          "md:text-[25px] text-lg tracking-normal font-normal max-w-2xl text-center",
+          "text-neutral-500 mt-2 leading-tight"
         )}
       >
         A single binary tool to capture, inspect and debug incoming webhooks in
@@ -46,10 +46,10 @@ export const Hero = () => {
         </div>
       </Link>
       <div className="relative mt-10 max-w-5xl mx-auto p-2">
-        <Circle
+        {/* <Circle
           className="absolute -top-35 -left-15 size-20 animate-pulse stroke-blue-thm/20"
           strokeWidth={2}
-        />
+        /> */}
         <img
           src={heroImage}
           alt="InHook - Webhook Inspector & Debugger"
