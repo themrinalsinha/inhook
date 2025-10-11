@@ -56,7 +56,7 @@ export const Hero = () => {
           className={cn(
             "shadow-sm rounded-lg mb-10 mx-auto w-full outline-1 mask-b-from-75% mask-b-to-95%"
           )}
-          loading="lazy"
+          loading="eager"
         />
       </div>
     </div>
