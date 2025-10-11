@@ -7,7 +7,6 @@ Wants=network-online.target
 User=www-data
 Group=www-data
 WorkingDirectory=/srv/inhook
-ExecStart=/srv/inhook/inhook
 ExecStart=/srv/inhook/inhook --config /srv/inhook/config.toml
 Restart=always
 RestartSec=5s
