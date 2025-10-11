@@ -81,9 +81,9 @@ const RequestContent = () => {
 const RequestRaw = ({ rawData }: { rawData: string }) => {
   return (
     <RequestBodyContainer>
-      <pre className="text-sm text-neutral-500 whitespace-pre-wrap p-5">
+      <div className="text-sm text-neutral-500 whitespace-pre-wrap p-5">
         {rawData}
-      </pre>
+      </div>
     </RequestBodyContainer>
   )
 }

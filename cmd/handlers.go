@@ -113,7 +113,7 @@ func webhookURLHandler(app *App) http.HandlerFunc {
 			return
 		}
 
-		requestDump, err := httputil.DumpRequest(r, false)
+		requestDump, err := httputil.DumpRequest(r, true)
 		if err != nil {
 			app.lo.Error(
 				fmt.Sprintf(
