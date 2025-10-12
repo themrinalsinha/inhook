@@ -1,6 +1,9 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+	"strings"
+)
 
 // corsMiddleware adds CORS headers to responses
 func corsMiddleware(next http.Handler) http.Handler {
@@ -9,7 +12,17 @@ func corsMiddleware(next http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Headers", "*")
 		w.Header().Set(
 			"Access-Control-Allow-Methods",
-			"GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD, CONNECT, TRACE",
+			strings.Join([]string{
+				http.MethodGet,
+				http.MethodPost,
+				http.MethodPut,
+				http.MethodDelete,
+				http.MethodOptions,
+				http.MethodPatch,
+				http.MethodHead,
+				http.MethodConnect,
+				http.MethodTrace,
+			}, ", "),
 		)
 		w.Header().Set("Access-Control-Max-Age", "3600")
 
