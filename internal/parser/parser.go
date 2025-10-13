@@ -15,6 +15,18 @@ func IsXMLContentType(contentType string) bool {
 	return strings.Contains(contentType, "application/xml")
 }
 
+func IsTextContentType(contentType string) bool {
+	return strings.Contains(contentType, "text/")
+}
+
+func _process(r *http.Request) (string, error) {
+	bodyBytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		return "", err
+	}
+	return string(bodyBytes), nil
+}
+
 func ParseBody(r *http.Request, contentType string) (string, error) {
 	if IsJSONContentType(contentType) {
 		var rawBody interface{}
@@ -26,11 +38,10 @@ func ParseBody(r *http.Request, contentType string) (string, error) {
 		return string(_bodyJSON), nil
 
 	} else if IsXMLContentType(contentType) {
-		bodyBytes, err := io.ReadAll(r.Body)
-		if err != nil {
-			return "", err
-		}
-		return string(bodyBytes), nil
+		return _process(r)
+
+	} else if IsTextContentType(contentType) {
+		return _process(r)
 	}
 
 	return "", nil

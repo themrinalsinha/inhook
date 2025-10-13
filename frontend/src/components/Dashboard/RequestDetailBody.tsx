@@ -1,6 +1,12 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table"
-import { RequestBodyContainer } from "@/components/Dashboard/RequestBodyContainer"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from "@/components/ui/table";
+import { RequestBodyContainer } from "@/components/Dashboard/RequestBodyContainer";
 import { JsonViewer as _JSONViewer } from "@/components/JsonViewer/JsonViewer";
 import _XMLViewer from "react-xml-viewer";
 import type { IWebhookEvent } from "@/types/webhook";
@@ -33,17 +39,19 @@ const RequestHeader = ({ headers }: { headers: Record<string, string> }) => {
 const _getContentData = (content_type: string, body: any): React.ReactNode => {
   if (content_type.includes("application/json")) {
     const parsedBody = JSON.parse(body);
-    return <_JSONViewer data={parsedBody} />
+    return <_JSONViewer data={parsedBody} />;
   } else if (content_type.includes("application/xml")) {
     return (
       <div className="text-sm p-2">
         <_XMLViewer xml={body} collapsible={true} indentSize={4} />
       </div>
     );
+  } else if (content_type.includes("text/plain")) {
+    return <pre className="text-sm whitespace-pre-wrap p-2">{body}</pre>;
   } else {
     return "";
   }
-}
+};
 
 const RequestContent = ({
   content,
@@ -55,9 +63,10 @@ const RequestContent = ({
   };
 }) => {
   const contentType = content.headers["Content-Type"] || "";
-  const contentData = useMemo(() => {
-    return _getContentData(contentType, content.body);
-  }, [contentType, content.body]);
+  const contentData = useMemo(
+    () => _getContentData(contentType, content.body),
+    [contentType, content.body]
+  );
 
   return (
     <RequestBodyContainer>
@@ -88,27 +97,24 @@ const RequestRaw = ({ rawData }: { rawData: Uint8Array }) => {
       </div>
     </RequestBodyContainer>
   );
-}
+};
 
 export const RequestDetailBody = ({
   selectedEvent,
 }: {
   selectedEvent: IWebhookEvent;
 }) => {
-
   const headersObj = {
     "Host": selectedEvent.host,
     "Remote Addr": selectedEvent.remote_addr,
-    ...JSON.parse(selectedEvent.headers)
+    ...JSON.parse(selectedEvent.headers),
   };
 
   const content = {
     queryParams: selectedEvent.query_params
       ? JSON.parse(selectedEvent.query_params)
       : {},
-    headers: selectedEvent.headers
-      ? JSON.parse(selectedEvent.headers)
-      : {},
+    headers: selectedEvent.headers ? JSON.parse(selectedEvent.headers) : {},
     body: selectedEvent.body || null,
   };
 
