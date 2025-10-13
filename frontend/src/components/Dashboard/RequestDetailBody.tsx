@@ -46,6 +46,8 @@ const _getContentData = (content_type: string, body: any): React.ReactNode => {
         <_XMLViewer xml={body} collapsible={true} indentSize={4} />
       </div>
     );
+  } else if (content_type.includes("application/yaml")) {
+    return <pre className="text-sm whitespace-pre-wrap p-2">{body}</pre>;
   } else if (content_type.includes("text/plain")) {
     return <pre className="text-sm whitespace-pre-wrap p-2">{body}</pre>;
   } else {
