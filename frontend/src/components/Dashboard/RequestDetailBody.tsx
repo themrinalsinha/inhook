@@ -2,6 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table"
 import { RequestBodyContainer } from "@/components/Dashboard/RequestBodyContainer"
 import { JsonViewer as _JSONViewer } from "@/components/JsonViewer/JsonViewer";
+import _XMLViewer from "react-xml-viewer";
 import type { IWebhookEvent } from "@/types/webhook";
 import { useMemo } from "react";
 // import ParseRawHTTP from "@/lib/ParseRawHTTP";
@@ -33,6 +34,12 @@ const _getContentData = (content_type: string, body: any): React.ReactNode => {
   if (content_type.includes("application/json")) {
     const parsedBody = JSON.parse(body);
     return <_JSONViewer data={parsedBody} />
+  } else if (content_type.includes("application/xml")) {
+    return (
+      <div className="text-sm p-2">
+        <_XMLViewer xml={body} collapsible={true} indentSize={4} />
+      </div>
+    );
   } else {
     return "";
   }
