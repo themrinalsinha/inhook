@@ -20,12 +20,13 @@ type WebhookEvent struct {
 	RequestID   string    `db:"request_id"`
 	CreatedAt   time.Time `db:"created_at"`
 	Method      string    `db:"method"`
+	Host        string    `db:"host"`
 	RemoteAddr  string    `db:"remote_addr"`
 	QueryParams string    `db:"query_params"`
 	Headers     string    `db:"headers"`   // json encoded
 	FormData    string    `db:"form_data"` // json encoded
 	Body        string    `db:"body"`      // json encoded
-	RawData     string    `db:"raw_data"`  // json encoded
+	RawData     []byte    `db:"raw_data"`  // json encoded
 	IsRead      bool      `db:"is_read"`
 }
 
@@ -115,10 +116,10 @@ func (s *DBService) CreateWebhookEvent(event WebhookEvent) (WebhookEvent, error)
 
 	result, err := s.db.Exec(
 		`INSERT INTO webhook_event (
-			token_id, request_id, method, remote_addr, query_params, headers,
+			token_id, request_id, method, host, remote_addr, query_params, headers,
 			form_data, body, raw_data
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		event.TokenID, event.RequestID, event.Method, event.RemoteAddr,
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		event.TokenID, event.RequestID, event.Method, event.Host, event.RemoteAddr,
 		event.QueryParams, event.Headers, event.FormData, event.Body, event.RawData,
 	)
 	if err != nil {
@@ -129,7 +130,7 @@ func (s *DBService) CreateWebhookEvent(event WebhookEvent) (WebhookEvent, error)
 	lastId, _ := result.LastInsertId()
 	err = s.db.Get(
 		&newEvent,
-		`SELECT id, token_id, request_id, created_at, method, remote_addr, query_params,
+		`SELECT id, token_id, request_id, created_at, method, host, remote_addr, query_params,
 		headers, form_data, body, raw_data, is_read FROM webhook_event WHERE id = ?`,
 		lastId,
 	)
@@ -144,7 +145,7 @@ func (s *DBService) GetWebhookEventForRequestID(tokenId int64) ([]WebhookEvent, 
 
 	err := s.db.Select(
 		&events,
-		`SELECT id, token_id, request_id, created_at, method, remote_addr, query_params,
+		`SELECT id, token_id, request_id, created_at, method, host, remote_addr, query_params,
 		headers, form_data, body, raw_data, is_read FROM webhook_event WHERE token_id = ?
 		ORDER BY created_at DESC LIMIT 50`,
 		tokenId,

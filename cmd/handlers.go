@@ -23,12 +23,13 @@ type WebhookEventResponse struct {
 	RequestID   string    `json:"request_id"`
 	CreatedAt   time.Time `json:"created_at"`
 	Method      string    `json:"method"`
+	Host        string    `json:"host"`
 	RemoteAddr  string    `json:"remote_addr"`
 	QueryParams string    `json:"query_params"`
 	Headers     string    `json:"headers"`
 	FormData    string    `json:"form_data"`
 	Body        string    `json:"body"`
-	RawData     string    `json:"raw_data"`
+	RawData     []byte    `json:"raw_data"`
 	IsRead      bool      `json:"is_read"`
 }
 
@@ -129,12 +130,13 @@ func webhookURLHandler(app *App) http.HandlerFunc {
 		event := WebhookEvent{
 			TokenID:     token.ID,
 			Method:      r.Method,
+			Host:        r.Host,
 			RemoteAddr:  r.RemoteAddr,
 			Headers:     string(headersJSON),
 			QueryParams: string(queryParamsJSON),
-			RawData:     string(requestDump),
+			RawData:     requestDump,
 		}
-		_, err = service.CreateWebhookEvent(event)
+		createdEvent, err := service.CreateWebhookEvent(event)
 		if err != nil {
 			app.lo.Error(
 				fmt.Sprintf(
@@ -146,7 +148,9 @@ func webhookURLHandler(app *App) http.HandlerFunc {
 			return
 		}
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(string(requestDump)))
+		w.Write([]byte(
+			"Event created successfully with request ID: " + createdEvent.RequestID,
+		))
 	}
 }
 
