@@ -33,10 +33,9 @@ export const Dashboard = () => {
 
   useEffect(() => {
     getWebhookConfig().then((config) => {
-      console.log(config);
       setWebhookConfig(config);
     });
-  }, []);
+  }, [webhookConfig?.host]);
 
   return (
     <Container className="h-screen mx-auto bg-neutral-100 p-5">

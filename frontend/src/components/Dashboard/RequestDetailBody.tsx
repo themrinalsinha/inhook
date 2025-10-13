@@ -3,15 +3,15 @@ import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/u
 import { RequestBodyContainer } from "@/components/Dashboard/RequestBodyContainer"
 import { JsonViewer } from "@/components/JsonViewer/JsonViewer";
 import type { IWebhookEvent } from "@/types/webhook";
+import ParseRawHTTP from "@/lib/ParseRawHTTP";
 
 
-const RequestHeader = ({ headers }: { headers: string }) => {
-  const headersObject = JSON.parse(headers);
+const RequestHeader = ({ headers }: { headers: Record<string, string> }) => {
   return (
     <RequestBodyContainer>
       <Table className="w-full text-sm text-neutral-500">
         <TableBody>
-          {Object.entries(headersObject).map(([key, value]) => (
+          {Object.entries(headers).map(([key, value]) => (
             <TableRow className="hover:bg-neutral-50">
               <TableHead className="w-1/3">{key}</TableHead>
               <TableCell className="w-2/3">{value as string}</TableCell>
@@ -78,11 +78,11 @@ const RequestContent = () => {
   )
 }
 
-const RequestRaw = ({ rawData }: { rawData: string }) => {
+const RequestRaw = ({ rawData }: { rawData: Uint8Array }) => {
   return (
     <RequestBodyContainer>
-      <div className="text-sm text-neutral-500 whitespace-pre-wrap p-5">
-        {rawData}
+      <div className="text-sm text-neutral-500 whitespace-pre-wrap p-2">
+        <ParseRawHTTP rawData={rawData} />
       </div>
     </RequestBodyContainer>
   )
@@ -93,6 +93,13 @@ export const RequestDetailBody = ({
 }: {
   selectedEvent: IWebhookEvent;
 }) => {
+
+  const headersObj = {
+    "Host": selectedEvent.host,
+    "Remote Addr": selectedEvent.remote_addr,
+    ...JSON.parse(selectedEvent.headers)
+  };
+
   return (
     <div>
       <p className="text-md font-semibold text-neutral-500 mt-2 mb-2">
@@ -111,7 +118,7 @@ export const RequestDetailBody = ({
           </TabsTrigger>
         </TabsList>
         <TabsContent value="header">
-          <RequestHeader headers={selectedEvent.headers} />
+          <RequestHeader headers={headersObj} />
         </TabsContent>
         <TabsContent value="content">
           <RequestContent />

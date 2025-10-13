@@ -14,7 +14,7 @@ const copyFaviconPlugin = () => {
 
       if (existsSync(faviconSource)) {
         copyFileSync(faviconSource, faviconDest)
-        console.log('✅ favicon.ico copied to assets directory')
+        console.log('favicon.ico copied to assets directory')
       }
     }
   }

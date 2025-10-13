@@ -10,12 +10,13 @@ export interface IWebhookEvent {
   request_id: string;
   created_at: Date;
   method: string;
+  host: string;
   remote_addr: string;
   query_params: string | null;
   headers: string;
   form_data: string | null;
   body: string | null;
-  raw_data: string;
+  raw_data: Uint8Array;
   is_read: boolean;
 }
 
