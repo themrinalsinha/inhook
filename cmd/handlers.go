@@ -9,6 +9,8 @@ import (
 	"net/http/httputil"
 	"path/filepath"
 	"time"
+
+	"github.com/themrinalsinha/inhook/internal/parser"
 )
 
 type WebhookTokenResponse struct {
@@ -127,6 +129,15 @@ func webhookURLHandler(app *App) http.HandlerFunc {
 		headersJSON, _ := json.Marshal(r.Header)
 		queryParamsJSON, _ := json.Marshal(r.URL.Query())
 
+		parsedBody, err := parser.ParseBody(r, r.Header.Get("Content-Type"))
+		if err != nil {
+			app.lo.Error(
+				fmt.Sprintf(
+					"[%d] Failed to parse body: %s", http.StatusInternalServerError, err),
+			)
+			return
+		}
+
 		event := WebhookEvent{
 			TokenID:     token.ID,
 			Method:      r.Method,
@@ -134,6 +145,7 @@ func webhookURLHandler(app *App) http.HandlerFunc {
 			RemoteAddr:  r.RemoteAddr,
 			Headers:     string(headersJSON),
 			QueryParams: string(queryParamsJSON),
+			Body:        parsedBody,
 			RawData:     requestDump,
 		}
 		createdEvent, err := service.CreateWebhookEvent(event)
