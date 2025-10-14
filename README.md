@@ -10,6 +10,21 @@ A fast, self-hosted webhook inspector for capturing and analyzing requests in re
 
 ## Installation
 
+### Local
+**Prerequisites:**
+You need to have `Go` and `pnpm` installed.
+
+To run locally:
+```shell
+make run
+```
+This will build the frontend and backend and run the server on `http://localhost:9000`.
+You can change the port by editing the `config.toml` file.
+```toml
+[app]
+port = ":9000"
+```
+
 ### Docker
 TBD
 
