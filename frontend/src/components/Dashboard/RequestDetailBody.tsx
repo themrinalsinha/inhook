@@ -115,7 +115,7 @@ export const RequestDetailBody = ({
   selectedEvent: IWebhookEvent;
 }) => {
   const headersObj = {
-    "Host": selectedEvent.host,
+    Host: selectedEvent.host,
     // "Remote Addr": selectedEvent.remote_addr,
     ...JSON.parse(selectedEvent.headers),
   };
@@ -124,16 +124,26 @@ export const RequestDetailBody = ({
     queryParams: selectedEvent.query_params
       ? JSON.parse(selectedEvent.query_params)
       : {},
-    formData: selectedEvent.form_data ? JSON.parse(selectedEvent.form_data) : {},
+    formData: selectedEvent.form_data
+      ? JSON.parse(selectedEvent.form_data)
+      : {},
     headers: selectedEvent.headers ? JSON.parse(selectedEvent.headers) : {},
     body: selectedEvent.body || null,
   };
 
   return (
     <div>
-      <p className="text-md font-semibold text-neutral-500 mt-2 mb-2">
-        Request Preview
-      </p>
+      <div className="flex justify-between items-center">
+        <p className="text-md font-semibold text-neutral-500 mt-2 mb-2">
+          Request Preview
+        </p>
+        <p className="text-sm font-normal text-neutral-500">
+          {selectedEvent?.request_id
+            ? `ID: ${selectedEvent.request_id.slice(0, 8)}`
+            : ""}
+        </p>
+      </div>
+
       <Tabs defaultValue="header">
         <TabsList className="w-full">
           <TabsTrigger value="header" className="text-neutral-700">
