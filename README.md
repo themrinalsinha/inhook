@@ -9,6 +9,8 @@
 A fast, self-hosted webhook inspector for capturing and analyzing requests in real time - packaged as a single binary.
 
 ![](/assets/splash.png)
+Visit <a href="https://inhook.mrinal.xyz" target="_blank">https://inhook.mrinal.xyz ↗</a> - to try it out.
+
 
 ## Installation
 
