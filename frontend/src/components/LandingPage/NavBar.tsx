@@ -4,14 +4,14 @@ import { cn } from "@/lib/utils";
 
 export const NavBar = () => {
   const navbarLinks = [
-    {
-      label: "About",
-      href: "#",
-    },
-    {
-      label: "Docs",
-      href: "#",
-    },
+    // {
+    //   label: "About",
+    //   href: "#",
+    // },
+    // {
+    //   label: "Docs",
+    //   href: "#",
+    // },
     {
       label: "Github",
       href: "https://github.com/themrinalsinha/inhook",
