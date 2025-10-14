@@ -32,8 +32,9 @@ type WebhookEventResponse struct {
 	Headers     string    `json:"headers"`
 	FormData    string    `json:"form_data"`
 	Body        string    `json:"body"`
-	RawData     []byte    `json:"raw_data"`
-	IsRead      bool      `json:"is_read"`
+	// RawData     []byte    `json:"raw_data"`
+	RawData string `json:"raw_data"`
+	IsRead  bool   `json:"is_read"`
 }
 
 func rootHandler(app *App) http.HandlerFunc {
@@ -169,7 +170,7 @@ func webhookURLHandler(app *App) http.HandlerFunc {
 			QueryParams: string(queryParamsJSON),
 			Body:        parsedBody,
 			FormData:    formData,
-			RawData:     requestDump,
+			RawData:     string(requestDump),
 		}
 		createdEvent, err := service.CreateWebhookEvent(event)
 		if err != nil {

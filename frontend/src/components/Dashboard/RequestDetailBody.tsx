@@ -98,12 +98,12 @@ const RequestContent = ({
 };
 
 // const RequestRaw = ({ rawData }: { rawData: Uint8Array }) => {
-const RequestRaw = () => {
+const RequestRaw = ({ rawData }: { rawData: string }) => {
   return (
     <RequestBodyContainer>
       <div className="text-sm text-neutral-500 whitespace-pre-wrap p-2">
         {/* <ParseRawHTTP rawData={rawData} /> */}
-        TBD: RAW DATA VIEWER
+        <pre className="text-sm whitespace-pre-wrap p-2">{rawData}</pre>
       </div>
     </RequestBodyContainer>
   );
@@ -163,8 +163,7 @@ export const RequestDetailBody = ({
           <RequestContent content={content} />
         </TabsContent>
         <TabsContent value="raw">
-          {/* <RequestRaw rawData={selectedEvent.raw_data} /> */}
-          <RequestRaw />
+          <RequestRaw rawData={selectedEvent.raw_data} />
         </TabsContent>
       </Tabs>
     </div>
