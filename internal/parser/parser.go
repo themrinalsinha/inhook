@@ -2,7 +2,6 @@ package parser
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -29,9 +28,6 @@ func _process(r *http.Request) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Println("======>>> BODY BYTES >>>>>")
-	fmt.Println(string(bodyBytes))
-	fmt.Println("======>>> BODY BYTES >>>>>")
 	return string(bodyBytes), nil
 }
 
@@ -48,9 +44,27 @@ func ParseBody(r *http.Request, contentType string) (string, error) {
 	} else if IsXMLContentType(contentType) ||
 		IsTextContentType(contentType) ||
 		IsYAMLContentType(contentType) {
-		fmt.Println("======>>> YAML CONTENT TYPE >>>>>")
 		return _process(r)
 	}
 
 	return "", nil
+}
+
+func ParseFormData(r *http.Request) (string, error) {
+	err := r.ParseForm()
+	if err != nil {
+		return "", err
+	}
+
+	formDataMap := make(map[string]string)
+	for key, values := range r.PostForm {
+		formDataMap[key] = strings.Join(values, ", ")
+	}
+
+	formDataJSON, err := json.Marshal(formDataMap)
+	if err != nil {
+		return "", err
+	}
+
+	return string(formDataJSON), nil
 }

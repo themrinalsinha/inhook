@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/themrinalsinha/inhook/internal/parser"
@@ -105,6 +106,19 @@ func webhookURLHandler(app *App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		app.lo.Info(fmt.Sprintf("Event Received - [%s] - %s", r.Method, r.URL.Path))
 
+		contentType := r.Header.Get("Content-Type")
+		formTypes := []string{
+			"application/x-www-form-urlencoded",
+			"multipart/form-data",
+		}
+		isFormType := false
+		for _, formType := range formTypes {
+			if strings.Contains(contentType, formType) {
+				isFormType = true
+				break
+			}
+		}
+
 		tokenId := r.PathValue("token_id")
 		service := DBService{db: app.db}
 
@@ -129,7 +143,15 @@ func webhookURLHandler(app *App) http.HandlerFunc {
 		headersJSON, _ := json.Marshal(r.Header)
 		queryParamsJSON, _ := json.Marshal(r.URL.Query())
 
-		parsedBody, err := parser.ParseBody(r, r.Header.Get("Content-Type"))
+		formData, _ := func() (string, error) {
+			if isFormType {
+				return parser.ParseFormData(r)
+			} else {
+				return "", nil
+			}
+		}()
+
+		parsedBody, err := parser.ParseBody(r, contentType)
 		if err != nil {
 			app.lo.Error(
 				fmt.Sprintf(
@@ -146,6 +168,7 @@ func webhookURLHandler(app *App) http.HandlerFunc {
 			Headers:     string(headersJSON),
 			QueryParams: string(queryParamsJSON),
 			Body:        parsedBody,
+			FormData:    formData,
 			RawData:     requestDump,
 		}
 		createdEvent, err := service.CreateWebhookEvent(event)

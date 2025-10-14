@@ -62,6 +62,7 @@ const RequestContent = ({
     queryParams: Record<string, string>;
     headers: Record<string, string>;
     body: any;
+    formData: Record<string, string>;
   };
 }) => {
   const contentType = content.headers["Content-Type"] || "";
@@ -76,6 +77,13 @@ const RequestContent = ({
         <div className="mb-2 p-2 outline-1 outline-neutral-200 rounded-lg">
           <p className="text-sm font-semibold text-neutral-500">Query params</p>
           <_TableViewer data={content.queryParams} />
+        </div>
+      )}
+
+      {Object.keys(content.formData).length > 0 && (
+        <div className="mb-2 p-2 outline-1 outline-neutral-200 rounded-lg">
+          <p className="text-sm font-semibold text-neutral-500">Form Data</p>
+          <_TableViewer data={content.formData} />
         </div>
       )}
 
@@ -108,7 +116,7 @@ export const RequestDetailBody = ({
 }) => {
   const headersObj = {
     "Host": selectedEvent.host,
-    "Remote Addr": selectedEvent.remote_addr,
+    // "Remote Addr": selectedEvent.remote_addr,
     ...JSON.parse(selectedEvent.headers),
   };
 
@@ -116,6 +124,7 @@ export const RequestDetailBody = ({
     queryParams: selectedEvent.query_params
       ? JSON.parse(selectedEvent.query_params)
       : {},
+    formData: selectedEvent.form_data ? JSON.parse(selectedEvent.form_data) : {},
     headers: selectedEvent.headers ? JSON.parse(selectedEvent.headers) : {},
     body: selectedEvent.body || null,
   };
