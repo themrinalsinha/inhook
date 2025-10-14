@@ -45,6 +45,6 @@ inHook is licensed under the [MIT](LICENSE.md) license.
 ----
 <div align="right">
   <a href="https://www.buymeacoffee.com/themrinalsinha" target="_blank">
-    <img src="assets/bmc-button.png" width="100" alt="Buy Me A Coffee" />
+    <img src="assets/bmc-button.png" width="150" alt="Buy Me A Coffee" />
   </a>
 </div>

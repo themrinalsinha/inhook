@@ -232,6 +232,20 @@ func getWebhookEventsHandler(app *App) http.HandlerFunc {
 	}
 }
 
+func markEventAsReadHandler(app *App) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		app.lo.Info("Marking event as read")
+		eventId := r.PathValue("event_id")
+		service := DBService{db: app.db}
+		err := service.MarkEventAsRead(eventId)
+		if err != nil {
+			http.Error(w, "Failed to mark event as read", http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
 func getWebhookConfigHandler(app *App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		app.lo.Info("Getting webhook config")
@@ -254,6 +268,9 @@ func initHandlers(app *App) http.Handler {
 		"GET /api/webhook/{token_id}/events/", getWebhookEventsHandler(app),
 	)
 	handler.HandleFunc("GET /api/webhook/config/{$}", getWebhookConfigHandler(app))
+	handler.HandleFunc(
+		"POST /api/webhook/event/{event_id}/read/", markEventAsReadHandler(app),
+	)
 
 	// Webhook URL handler - accepts all HTTP methods
 	handleAllMethods(handler, "/webhook/{token_id}/", webhookURLHandler(app))

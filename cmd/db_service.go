@@ -155,3 +155,11 @@ func (s *DBService) GetWebhookEventForRequestID(tokenId int64) ([]WebhookEvent, 
 	}
 	return events, nil
 }
+
+func (s *DBService) MarkEventAsRead(eventId string) error {
+	_, err := s.db.Exec("UPDATE webhook_event SET is_read = TRUE WHERE id = ?", eventId)
+	if err != nil {
+		return err
+	}
+	return nil
+}

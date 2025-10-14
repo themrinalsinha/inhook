@@ -52,3 +52,11 @@ export const getWebhookConfig = async () => {
   }
   return response.data as IWebhookConfig;
 };
+
+export const markEventAsRead = async (eventId: number) => {
+  const response = await api.post(`/api/webhook/event/${eventId}/read/`);
+  if (response.status !== 200) {
+    throw new Error("Failed to mark event as read");
+  }
+  return response.data;
+};

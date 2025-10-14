@@ -97,8 +97,8 @@ const RequestContent = ({
   );
 };
 
-const RequestRaw = ({ rawData }: { rawData: Uint8Array }) => {
-  console.log(rawData);
+// const RequestRaw = ({ rawData }: { rawData: Uint8Array }) => {
+const RequestRaw = () => {
   return (
     <RequestBodyContainer>
       <div className="text-sm text-neutral-500 whitespace-pre-wrap p-2">
@@ -153,7 +153,8 @@ export const RequestDetailBody = ({
           <RequestContent content={content} />
         </TabsContent>
         <TabsContent value="raw">
-          <RequestRaw rawData={selectedEvent.raw_data} />
+          {/* <RequestRaw rawData={selectedEvent.raw_data} /> */}
+          <RequestRaw />
         </TabsContent>
       </Tabs>
     </div>

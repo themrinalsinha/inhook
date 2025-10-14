@@ -3,6 +3,8 @@ import { ChevronRight } from "lucide-react";
 import MethodBadge from "@/components/Utils/Methods";
 import type { IWebhookEvent } from "@/types/webhook";
 import moment from "moment";
+import { markEventAsRead } from "@/api";
+
 
 export const RequestEventNode = ({
   event, handleSelectEvent,
@@ -10,14 +12,28 @@ export const RequestEventNode = ({
   event: IWebhookEvent;
   handleSelectEvent: (event: IWebhookEvent) => void;
 }) => {
+
+  const handleClickEvent = (event: IWebhookEvent) => {
+    if (event.is_read) {
+      handleSelectEvent(event)
+    } else {
+      markEventAsRead(event.id).then(() => handleSelectEvent(event));
+    }
+  };
+
   const { bgColor, textColor, icon: Icon } = MethodBadge[event.method];
+  const isNotReadTheme = (
+    event.is_read
+    ? "hover:border-neutral-700 hover:border-1"
+    : "border-l-4 border-blue-thm"
+  );
+
   return (
-    <div onClick={() => handleSelectEvent(event)}>
+    <div onClick={() => handleClickEvent(event)}>
       <div
         className={cn(
-          "flex flex-col justify-between h-12 px-1 border-1 border-neutral-200 rounded-sm",
-          bgColor,
-          "hover:border-neutral-700 hover:border-1 hover:cursor-pointer",
+          "flex flex-col justify-between h-12 px-1 border-1 border-neutral-200",
+          `rounded-sm hover:cursor-pointer ${bgColor} ${isNotReadTheme}`,
           "transition-all duration-300"
         )}
       >
