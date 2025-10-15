@@ -45,6 +45,7 @@ export const RequestInfo = () => {
         className="w-1/4 px-4 pr-0"
         webhookEvents={webhookEvents}
         handleSelectEvent={handleSelectEvent}
+        selectedEvent={selectedEvent}
       />
       <RequestDetail className="w-3/4 px-4" selectedEvent={selectedEvent} />
     </div>

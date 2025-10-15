@@ -8,10 +8,12 @@ export const SidePanel = ({
   className,
   webhookEvents,
   handleSelectEvent,
+  selectedEvent,
 }: {
   className?: string;
   webhookEvents: IWebhookEvent[];
   handleSelectEvent: (event: IWebhookEvent) => void;
+  selectedEvent: IWebhookEvent | null;
 }) => {
   return (
     <div className={className}>
@@ -47,6 +49,7 @@ export const SidePanel = ({
                 event={event}
                 key={event.id}
                 handleSelectEvent={handleSelectEvent}
+                selectedEvent={selectedEvent}
               />
             ))
           )}

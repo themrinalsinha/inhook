@@ -5,28 +5,28 @@ import type { IWebhookEvent } from "@/types/webhook";
 import moment from "moment";
 import { markEventAsRead } from "@/api";
 
-
 export const RequestEventNode = ({
-  event, handleSelectEvent,
+  event,
+  handleSelectEvent,
+  selectedEvent,
 }: {
   event: IWebhookEvent;
   handleSelectEvent: (event: IWebhookEvent) => void;
+  selectedEvent: IWebhookEvent | null;
 }) => {
-
   const handleClickEvent = (event: IWebhookEvent) => {
     if (event.is_read) {
-      handleSelectEvent(event)
+      handleSelectEvent(event);
     } else {
       markEventAsRead(event.id).then(() => handleSelectEvent(event));
     }
   };
 
+  const isSelected = selectedEvent?.id === event.id;
   const { bgColor, textColor, icon: Icon } = MethodBadge[event.method];
-  const isNotReadTheme = (
-    event.is_read
+  const isNotReadTheme = event.is_read
     ? "hover:border-neutral-700 hover:border-1"
-    : "border-l-4 border-blue-thm"
-  );
+    : "border-l-4 border-blue-thm";
 
   return (
     <div onClick={() => handleClickEvent(event)}>
@@ -34,7 +34,8 @@ export const RequestEventNode = ({
         className={cn(
           "flex flex-col justify-between h-12 px-1 border-1 border-neutral-200",
           `rounded-sm hover:cursor-pointer ${bgColor} ${isNotReadTheme}`,
-          "transition-all duration-300"
+          "transition-all duration-300",
+          isSelected ? "shadow-sm border-b border-blue-thm" : ""
         )}
       >
         <div className="flex items-baseline justify-between">
@@ -55,7 +56,12 @@ export const RequestEventNode = ({
           <div className="tracking-wider text-xs text-neutral-500 ml-4 mb-2">
             {event.request_id.slice(0, 8)}
           </div>
-          <ChevronRight className="size-4 hover:cursor-pointer text-neutral-500" />
+          <ChevronRight
+            className={cn(
+              "size-4 hover:cursor-pointer text-neutral-500",
+              isSelected ? "text-blue-thm" : ""
+            )}
+          />
         </div>
       </div>
     </div>
