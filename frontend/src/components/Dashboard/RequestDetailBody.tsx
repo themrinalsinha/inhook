@@ -1,58 +1,59 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-} from "@/components/ui/table";
+
 import { RequestBodyContainer } from "@/components/Dashboard/RequestBodyContainer";
-import { JsonViewer as _JSONViewer } from "@/components/JsonViewer/JsonViewer";
-import _XMLViewer from "react-xml-viewer";
+import { JsonViewer } from "@/components/JsonViewer/JsonViewer";
+import XMLViewer from "react-xml-viewer";
 import type { IWebhookEvent } from "@/types/webhook";
 import { useMemo } from "react";
-import ParseRawHTTP from "@/lib/ParseRawHTTP";
+import { ParseRawHTTP, GetParsedMultipartData } from "@/lib/ParseRawHTTP";
+import { TableViewer } from "@/components/Utils/Viewers";
 
-const _TableViewer = ({ data }: { data: Record<string, string> }) => {
-  return (
-    <Table>
-      <TableBody>
-        {Object.entries(data).map(([key, value]) => (
-          <TableRow className="hover:bg-neutral-50">
-            <TableHead className="w-1/3">{key}</TableHead>
-            <TableCell className="w-2/3">{value as string}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  );
-};
 
 const RequestHeader = ({ headers }: { headers: Record<string, string> }) => {
   return (
     <RequestBodyContainer>
-      <_TableViewer data={headers} />
+      <TableViewer data={headers} />
     </RequestBodyContainer>
   );
 };
 
-const _getContentData = (content_type: string, body: any): React.ReactNode => {
+const _getContentData = (
+  content_type: string,
+  content: any
+): React.ReactNode => {
+  // JSON
   if (content_type.includes("application/json")) {
-    const parsedBody = JSON.parse(body);
-    return <_JSONViewer data={parsedBody} />;
-  } else if (content_type.includes("application/xml")) {
+    const parsedBody = JSON.parse(content.body);
+    return <JsonViewer data={parsedBody} />;
+  }
+
+  // XML
+  if (content_type.includes("application/xml")) {
     return (
       <div className="text-sm p-2">
-        <_XMLViewer xml={body} collapsible={true} indentSize={4} />
+        <XMLViewer xml={content.body} collapsible={true} indentSize={4} />
       </div>
     );
-  } else if (content_type.includes("application/yaml")) {
-    return <pre className="text-sm whitespace-pre-wrap p-2">{body}</pre>;
-  } else if (content_type.includes("text/plain")) {
-    return <pre className="text-sm whitespace-pre-wrap p-2">{body}</pre>;
-  } else {
-    return "";
   }
+
+  // YAML + Text + HTML
+  if (
+    content_type.includes("application/yaml") ||
+    content_type.includes("text/plain") ||
+    content_type.includes("text/html")
+  ) {
+    return (
+      <pre className="text-sm whitespace-pre-wrap p-2">{content.body}</pre>
+    );
+  }
+
+  // Multipart
+  if (content_type.includes("multipart/form-data")) {
+    return <GetParsedMultipartData rawData={content.rawData} />;
+  }
+
+  // Other
+  return null;
 };
 
 const RequestContent = ({
@@ -63,12 +64,19 @@ const RequestContent = ({
     headers: Record<string, string>;
     body: any;
     formData: Record<string, string>;
+    rawData: string
   };
 }) => {
-  const contentType = content.headers["Content-Type"] || "";
+  const contentTypeHeader = content.headers["Content-Type"];
+
+  const contentTypeStr = Array.isArray(contentTypeHeader)
+    ? contentTypeHeader.join(", ")
+    : contentTypeHeader;
+  const contentType = contentTypeStr?.split(";")[0]?.trim() ?? "";
+
   const contentData = useMemo(
-    () => _getContentData(contentType, content.body),
-    [contentType, content.body]
+    () => _getContentData(contentType, content),
+    [contentType, content]
   );
 
   return (
@@ -76,23 +84,24 @@ const RequestContent = ({
       {Object.keys(content.queryParams).length > 0 && (
         <div className="mb-2 p-2 outline-1 outline-neutral-200 rounded-lg">
           <p className="text-sm font-semibold text-neutral-500">Query params</p>
-          <_TableViewer data={content.queryParams} />
+          <TableViewer data={content.queryParams} />
         </div>
       )}
 
       {Object.keys(content.formData).length > 0 && (
         <div className="mb-2 p-2 outline-1 outline-neutral-200 rounded-lg">
           <p className="text-sm font-semibold text-neutral-500">Form Data</p>
-          <_TableViewer data={content.formData} />
+          <TableViewer data={content.formData} />
         </div>
       )}
 
-      {contentData && (
+      {contentData !== null && (
         <div className="p-2 outline-1 outline-neutral-200 rounded-lg">
           <p className="text-sm font-semibold text-neutral-500">Request Body</p>
           {contentData}
         </div>
       )}
+
     </RequestBodyContainer>
   );
 };
@@ -127,6 +136,7 @@ export const RequestDetailBody = ({
       : {},
     headers: selectedEvent.headers ? JSON.parse(selectedEvent.headers) : {},
     body: selectedEvent.body || null,
+    rawData: selectedEvent.raw_data,
   };
 
   return (
