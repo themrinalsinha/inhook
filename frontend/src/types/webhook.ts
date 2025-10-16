@@ -16,8 +16,7 @@ export interface IWebhookEvent {
   headers: string;
   form_data: string | null;
   body: string | null;
-  // raw_data: Uint8Array;
-  raw_data: string;
+  raw_data: string; // base64 encoded string
   is_read: boolean;
 }
 

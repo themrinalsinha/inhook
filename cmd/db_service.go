@@ -26,9 +26,8 @@ type WebhookEvent struct {
 	Headers     string    `db:"headers"`   // json encoded
 	FormData    string    `db:"form_data"` // json encoded
 	Body        string    `db:"body"`      // json encoded
-	// RawData     []byte    `db:"raw_data"`  // json encoded
-	RawData string `db:"raw_data"` // json encoded
-	IsRead  bool   `db:"is_read"`
+	RawData     []byte    `db:"raw_data"`  // json encoded
+	IsRead      bool      `db:"is_read"`
 }
 
 type DBService struct {

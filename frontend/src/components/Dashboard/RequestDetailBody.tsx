@@ -11,7 +11,7 @@ import { JsonViewer as _JSONViewer } from "@/components/JsonViewer/JsonViewer";
 import _XMLViewer from "react-xml-viewer";
 import type { IWebhookEvent } from "@/types/webhook";
 import { useMemo } from "react";
-// import ParseRawHTTP from "@/lib/ParseRawHTTP";
+import ParseRawHTTP from "@/lib/ParseRawHTTP";
 
 const _TableViewer = ({ data }: { data: Record<string, string> }) => {
   return (
@@ -97,13 +97,11 @@ const RequestContent = ({
   );
 };
 
-// const RequestRaw = ({ rawData }: { rawData: Uint8Array }) => {
 const RequestRaw = ({ rawData }: { rawData: string }) => {
   return (
     <RequestBodyContainer>
       <div className="text-sm text-neutral-500 whitespace-pre-wrap p-2">
-        {/* <ParseRawHTTP rawData={rawData} /> */}
-        <pre className="text-sm whitespace-pre-wrap p-2">{rawData}</pre>
+        <ParseRawHTTP rawData={rawData} />
       </div>
     </RequestBodyContainer>
   );

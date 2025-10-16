@@ -5,15 +5,18 @@ import parser from "http-message-parser";
 
 type _ParsedRawHTTPResponse = {};
 
-const ProcessRawHTTP = (rawData: Uint8Array): _ParsedRawHTTPResponse => {
+const ProcessRawHTTP = (rawData: string): _ParsedRawHTTPResponse => {
   const binary = atob(rawData);
   const parsed = parser(binary);
-
-  return parsed.headers
+  return parsed
 };
 
-export default function ParseRawHTTP({ rawData }: { rawData: Uint8Array }) {
-  const parsed = useMemo(() => ProcessRawHTTP(rawData), [rawData]);
+export default function ParseRawHTTP({ rawData }: { rawData: string }) {
+  const rawStr = atob(rawData);
 
-  return <div>{JSON.stringify(parsed)}</div>;
+  return (
+    <pre className="text-sm whitespace-pre-wrap p-2">
+      {rawStr}
+    </pre>
+  )
 }
