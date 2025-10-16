@@ -39,6 +39,7 @@ const _getContentData = (
   // YAML + Text + HTML
   if (
     content_type.includes("application/yaml") ||
+    content_type.includes("application/edn") ||
     content_type.includes("text/plain") ||
     content_type.includes("text/html")
   ) {
@@ -81,27 +82,30 @@ const RequestContent = ({
 
   return (
     <RequestBodyContainer>
-      {Object.keys(content.queryParams).length > 0 && (
-        <div className="mb-2 p-2 outline-1 outline-neutral-200 rounded-lg">
-          <p className="text-sm font-semibold text-neutral-500">Query params</p>
-          <TableViewer data={content.queryParams} />
-        </div>
+      {contentType && (
+        <p className="flex justify-end items-center text-sm text-neutral-400 mb-2">
+          Content Type: {contentType}
+        </p>
       )}
 
-      {Object.keys(content.formData).length > 0 && (
-        <div className="mb-2 p-2 outline-1 outline-neutral-200 rounded-lg">
-          <p className="text-sm font-semibold text-neutral-500">Form Data</p>
-          <TableViewer data={content.formData} />
-        </div>
-      )}
+      <div className="mb-2 p-2 outline-1 outline-neutral-200 rounded-lg">
+        <p className="text-sm font-semibold text-neutral-500">Query params</p>
+        <TableViewer data={content.queryParams} />
+      </div>
 
-      {contentData !== null && (
-        <div className="p-2 outline-1 outline-neutral-200 rounded-lg">
-          <p className="text-sm font-semibold text-neutral-500">Request Body</p>
-          {contentData}
-        </div>
-      )}
+      <div className="mb-2 p-2 outline-1 outline-neutral-200 rounded-lg">
+        <p className="text-sm font-semibold text-neutral-500">Form Data</p>
+        <TableViewer data={content.formData} />
+      </div>
 
+      <div className="mb-2 p-2 outline-1 outline-neutral-200 rounded-lg">
+        <div className="flex justify-between items-center">
+          <p className="text-sm font-semibold text-neutral-500">
+            Request Body / Multipart Data
+          </p>
+        </div>
+        {contentData}
+      </div>
     </RequestBodyContainer>
   );
 };

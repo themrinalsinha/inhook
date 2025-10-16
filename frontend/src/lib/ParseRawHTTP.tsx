@@ -4,14 +4,17 @@ import type { ReactNode } from "react";
 import { useMemo } from "react";
 import parser from "http-message-parser";
 
-type _ParsedRawHTTPResponse = {};
+const _processMultipartData = (rawData: string) => {
+  const binary = atob(rawData);
+  const parsed = parser(binary);
+  console.log("Parsed ---> ", parsed)
+  return null
+}
 
 export const GetParsedMultipartData = (
   { rawData }: { rawData: string }
 ): ReactNode => {
-  const binary = atob(rawData);
-  const parsed = parser(binary);
-
+  _processMultipartData(rawData)
   return <></>
 };
 

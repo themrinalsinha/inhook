@@ -35,6 +35,10 @@ func IsMultipartFormDataContentType(contentType string) bool {
 	return strings.Contains(contentType, "multipart/form-data")
 }
 
+func IsEDNContentType(contentType string) bool {
+	return strings.Contains(contentType, "application/edn")
+}
+
 func _process(r *http.Request) (string, error) {
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -56,6 +60,7 @@ func ParseBody(r *http.Request, contentType string) (string, error) {
 	} else if IsXMLContentType(contentType) ||
 		IsTextContentType(contentType) ||
 		IsYAMLContentType(contentType) ||
+		IsEDNContentType(contentType) ||
 		IsHTMLContentType(contentType) {
 		return _process(r)
 	}
