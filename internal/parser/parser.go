@@ -82,29 +82,30 @@ func _ProcessFormURLEncoded(r *http.Request) (string, error) {
 	return string(formDataJSON), nil
 }
 
-func _ProcessMultipartFormData(r *http.Request) (string, error) {
-	err := r.ParseMultipartForm(100 * 1024 * 1024) // 100MB
-	if err != nil {
-		return "", err
-	}
+// func _ProcessMultipartFormData(r *http.Request) (string, error) {
+// 	err := r.ParseMultipartForm(100 * 1024 * 1024) // 100MB
+// 	if err != nil {
+// 		return "", err
+// 	}
 
-	formDataMap := make(map[string]string)
-	for key, values := range r.MultipartForm.Value {
-		formDataMap[key] = strings.Join(values, ", ")
-	}
+// 	formDataMap := make(map[string]string)
+// 	for key, values := range r.MultipartForm.Value {
+// 		formDataMap[key] = strings.Join(values, ", ")
+// 	}
 
-	formDataJSON, err := json.Marshal(formDataMap)
-	if err != nil {
-		return "", err
-	}
-	return string(formDataJSON), nil
-}
+// 	formDataJSON, err := json.Marshal(formDataMap)
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	return string(formDataJSON), nil
+// }
 
 func ParseFormData(r *http.Request) (string, error) {
 	if IsFormURLEncodedContentType(r.Header.Get("Content-Type")) {
 		return _ProcessFormURLEncoded(r)
 	} else if IsMultipartFormDataContentType(r.Header.Get("Content-Type")) {
-		return _ProcessMultipartFormData(r)
+		// return _ProcessMultipartFormData(r)
+		return "", nil
 	}
 	return "", nil
 }
