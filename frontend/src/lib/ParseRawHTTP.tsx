@@ -7,7 +7,12 @@ import parser from "http-message-parser";
 const _processMultipartData = (rawData: string) => {
   const binary = atob(rawData);
   const parsed = parser(binary);
-  console.log("Parsed ---> ", parsed)
+
+  const formData = {}
+  const multipartData = parsed.multipart
+
+  // TODO: parse and process multipart data
+
   return null
 }
 
