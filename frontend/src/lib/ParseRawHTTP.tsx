@@ -27,9 +27,9 @@ const _parseHeaders = (headers: Record<string, any>) : Record<string, any> => {
   return headersObj;
 };
 
-const _getDecodedBody = (body: Uint8Array) => {
+const _getDecodedTextBody = (body: Uint8Array): ReactNode => {
   const text = new TextDecoder().decode(body);
-  return text.trim();
+  return <pre className="text-sm whitespace-pre-wrap">{text.trim()}</pre>;
 }
 
 const _processMultipartData = (rawData: string) => {
@@ -41,12 +41,24 @@ const _processMultipartData = (rawData: string) => {
 
   for (const data of multipartData) {
     const headers = _parseHeaders(data.headers);
-    if (!headers["content-type"]) {
-      formData[headers["content-disposition"]?.name] = _getDecodedBody(
+    const contentType = headers["content-type"];
+
+    const isTextContentType = (
+      contentType?.type.includes("text/") ||
+      contentType?.type.includes("application/json") ||
+      contentType?.type.includes("application/xml") ||
+      contentType?.type.includes("application/yaml") ||
+      contentType?.type.includes("application/edn") ||
+      contentType?.type.includes("application/html")
+    )
+
+    if (!contentType || isTextContentType) {
+      formData[headers["content-disposition"]?.name] = _getDecodedTextBody(
         data.body
       );
     }
   }
+
   return formData;
 };
 
