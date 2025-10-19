@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { useMemo } from "react";
 import parser from "http-message-parser";
 import { TableViewer } from "@/components/Utils/Viewers";
+import { DownloadIcon } from "lucide-react";
 
 const _parseHeaders = (headers: Record<string, any>) : Record<string, any> => {
   const headersObj: Record<string, any> = {};
@@ -32,6 +33,34 @@ const _getDecodedTextBody = (body: Uint8Array): ReactNode => {
   return <pre className="text-sm whitespace-pre-wrap">{text.trim()}</pre>;
 }
 
+const _getDecodedBinaryBody = (
+  body: Uint8Array,
+  contentType: string,
+  filename: string
+): ReactNode => {
+  // how to get size of binary body in human readable format?
+  const size = body.length;
+  const sizeInHumanReadable =
+    size > 1024 ? `${(size / 1024).toFixed(2)} KB` : `${size} B`;
+
+  const binaryBlob = new Blob([body], { type: contentType });
+  const binaryObjectUrl = URL.createObjectURL(binaryBlob);
+
+  return (
+    <div className="flex items-center justify-between rounded-md w-full">
+      <span className="text-sm">
+        {filename} <span className="text-neutral-500">({contentType})</span>
+      </span>
+      <span className="flex items-center justify-center">
+        <p className="text-sm text-neutral-500">{sizeInHumanReadable}</p>
+        <a href={binaryObjectUrl} download={filename} className="ml-2">
+          <DownloadIcon className="size-4 text-neutral-500" />
+        </a>
+      </span>
+    </div>
+  );
+};
+
 const _processMultipartData = (rawData: string) => {
   const binary = atob(rawData);
   const parsed = parser(binary);
@@ -43,18 +72,23 @@ const _processMultipartData = (rawData: string) => {
     const headers = _parseHeaders(data.headers);
     const contentType = headers["content-type"];
 
-    const isTextContentType = (
+    const isTextContentType =
       contentType?.type.includes("text/") ||
       contentType?.type.includes("application/json") ||
       contentType?.type.includes("application/xml") ||
       contentType?.type.includes("application/yaml") ||
       contentType?.type.includes("application/edn") ||
-      contentType?.type.includes("application/html")
-    )
+      contentType?.type.includes("application/html");
 
     if (!contentType || isTextContentType) {
       formData[headers["content-disposition"]?.name] = _getDecodedTextBody(
         data.body
+      );
+    } else {
+      formData[headers["content-disposition"]?.name] = _getDecodedBinaryBody(
+        data.body,
+        contentType?.type || "application/octet-stream",
+        headers["content-disposition"]?.filename || "filename"
       );
     }
   }
