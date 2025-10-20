@@ -4,10 +4,8 @@ import { RequestBodyContainer } from "@/components/Dashboard/RequestBodyContaine
 import { JsonViewer } from "@/components/JsonViewer/JsonViewer";
 import XMLViewer from "react-xml-viewer";
 import type { IWebhookEvent } from "@/types/webhook";
-import { useMemo } from "react";
-import { ParseRawHTTP, GetParsedMultipartData } from "@/lib/ParseRawHTTP";
+import { ParseRawHTTP, getParsedMultipartData } from "@/lib/ParseRawHTTP";
 import { TableViewer } from "@/components/Utils/Viewers";
-
 
 const RequestHeader = ({ headers }: { headers: Record<string, string> }) => {
   return (
@@ -20,20 +18,24 @@ const RequestHeader = ({ headers }: { headers: Record<string, string> }) => {
 const _getContentData = (
   content_type: string,
   content: any
-): React.ReactNode => {
+): [boolean, React.ReactNode] => {
   // JSON
   if (content_type.includes("application/json")) {
     const parsedBody = JSON.parse(content.body);
-    return <JsonViewer data={parsedBody} />;
+    return [true, <JsonViewer data={parsedBody} />];
   }
 
   // XML
   if (content_type.includes("application/xml")) {
-    return (
-      <div className="text-sm p-2">
-        <XMLViewer xml={content.body} collapsible={true} indentSize={4} />
-      </div>
-    );
+    if (content.body) {
+      return [
+        true,
+        <div className="text-sm p-2">
+          <XMLViewer xml={content.body} collapsible={true} indentSize={4} />
+        </div>,
+      ];
+    }
+    return [false, null];
   }
 
   // YAML + Text + HTML
@@ -43,18 +45,26 @@ const _getContentData = (
     content_type.includes("text/plain") ||
     content_type.includes("text/html")
   ) {
-    return (
-      <pre className="text-sm whitespace-pre-wrap p-2">{content.body}</pre>
-    );
+    if (content.body) {
+      return [
+        true,
+        <pre className="text-sm whitespace-pre-wrap p-2">{content.body}</pre>,
+      ];
+    }
+    return [false, null];
   }
 
   // Multipart
   if (content_type.includes("multipart/form-data")) {
-    return <GetParsedMultipartData rawData={content.rawData} />;
+    const formData = getParsedMultipartData(content.rawData);
+    if (Object.keys(formData).length > 0) {
+      return [true, <TableViewer data={formData} />];
+    }
+    return [false, null];
   }
 
   // Other
-  return null;
+  return [false, null];
 };
 
 const RequestContent = ({
@@ -65,7 +75,7 @@ const RequestContent = ({
     headers: Record<string, string>;
     body: any;
     formData: Record<string, string>;
-    rawData: string
+    rawData: string;
   };
 }) => {
   const contentTypeHeader = content.headers["Content-Type"];
@@ -74,11 +84,7 @@ const RequestContent = ({
     ? contentTypeHeader.join(", ")
     : contentTypeHeader;
   const contentType = contentTypeStr?.split(";")[0]?.trim() ?? "";
-
-  const contentData = useMemo(
-    () => _getContentData(contentType, content),
-    [contentType, content]
-  );
+  const [hasContentData, contentData] = _getContentData(contentType, content);
 
   return (
     <RequestBodyContainer>
@@ -88,24 +94,30 @@ const RequestContent = ({
         </p>
       )}
 
-      <div className="mb-2 p-2 outline-1 outline-neutral-200 rounded-lg">
-        <p className="text-sm font-semibold text-neutral-500">Query params</p>
-        <TableViewer data={content.queryParams} />
-      </div>
-
-      <div className="mb-2 p-2 outline-1 outline-neutral-200 rounded-lg">
-        <p className="text-sm font-semibold text-neutral-500">Form Data</p>
-        <TableViewer data={content.formData} />
-      </div>
-
-      <div className="mb-2 p-2 outline-1 outline-neutral-200 rounded-lg">
-        <div className="flex justify-between items-center">
-          <p className="text-sm font-semibold text-neutral-500">
-            Request Body / Multipart Data
-          </p>
+      {content.queryParams && Object.keys(content.queryParams).length > 0 && (
+        <div className="mb-2 p-2 outline-1 outline-neutral-200 rounded-lg">
+          <p className="text-sm font-semibold text-neutral-500">Query params</p>
+          <TableViewer data={content.queryParams} />
         </div>
-        {contentData}
-      </div>
+      )}
+
+      {content.formData && Object.keys(content.formData).length > 0 && (
+        <div className="mb-2 p-2 outline-1 outline-neutral-200 rounded-lg">
+          <p className="text-sm font-semibold text-neutral-500">Form Data</p>
+          <TableViewer data={content.formData} />
+        </div>
+      )}
+
+      {hasContentData && (
+        <div className="mb-2 p-2 outline-1 outline-neutral-200 rounded-lg">
+          <div className="flex justify-between items-center">
+            <p className="text-sm font-semibold text-neutral-500">
+              Request Body / Multipart Data
+            </p>
+          </div>
+          {contentData}
+        </div>
+      )}
     </RequestBodyContainer>
   );
 };

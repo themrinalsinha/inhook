@@ -93,7 +93,7 @@ const _getDecodedBinaryBody = (
   );
 };
 
-const _processMultipartData = (rawData: string) => {
+export const getParsedMultipartData = (rawData: string) => {
   const binary = atob(rawData);
   const parsed = parser(binary);
 
@@ -126,13 +126,6 @@ const _processMultipartData = (rawData: string) => {
   }
 
   return formData;
-};
-
-export const GetParsedMultipartData = (
-  { rawData }: { rawData: string }
-): ReactNode => {
-  const formData = _processMultipartData(rawData);
-  return <TableViewer data={formData} />
 };
 
 export function ParseRawHTTP({ rawData }: { rawData: string }) {
