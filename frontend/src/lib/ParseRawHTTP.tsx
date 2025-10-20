@@ -8,7 +8,11 @@ import { DownloadIcon } from "lucide-react";
 
 const useDownload = () => {
   return useCallback(
-    (data: Uint8Array, contentType: "application/octet-stream", filename) => {
+    (
+      data: Uint8Array,
+      contentType: string = "application/octet-stream",
+      filename: string
+    ) => {
       const blob = new Blob([data], { type: contentType });
 
       if (window.navigator && (window.navigator as any).msSaveOrOpenBlob) {
@@ -23,6 +27,11 @@ const useDownload = () => {
       a.download = filename;
       document.body.appendChild(a);
       a.click();
+
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
     },
     []
   );
