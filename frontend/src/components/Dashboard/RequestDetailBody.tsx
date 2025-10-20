@@ -149,11 +149,11 @@ export const RequestDetailBody = ({
         <p className="text-md font-semibold text-neutral-500 mt-2 mb-2">
           Request Preview
         </p>
-        <p className="text-sm font-normal text-neutral-500">
+        {/* <p className="text-sm font-normal text-neutral-500">
           {selectedEvent?.request_id
             ? `ID: ${selectedEvent.request_id.slice(0, 8)}`
             : ""}
-        </p>
+        </p> */}
       </div>
 
       <Tabs defaultValue="header">
