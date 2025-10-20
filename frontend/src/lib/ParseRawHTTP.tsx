@@ -1,10 +1,32 @@
 // @ts-nocheck
 
-import type { ReactNode } from "react";
+import { useCallback, type ReactNode } from "react";
 import { useMemo } from "react";
 import parser from "http-message-parser";
 import { TableViewer } from "@/components/Utils/Viewers";
 import { DownloadIcon } from "lucide-react";
+
+const useDownload = () => {
+  return useCallback(
+    (data: Uint8Array, contentType: "application/octet-stream", filename) => {
+      const blob = new Blob([data], { type: contentType });
+
+      if (window.navigator && (window.navigator as any).msSaveOrOpenBlob) {
+        (window.navigator as any).msSaveOrOpenBlob(blob, filename);
+        return;
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+    },
+    []
+  );
+};
 
 const _parseHeaders = (headers: Record<string, any>) : Record<string, any> => {
   const headersObj: Record<string, any> = {};
@@ -42,9 +64,7 @@ const _getDecodedBinaryBody = (
   const size = body.length;
   const sizeInHumanReadable =
     size > 1024 ? `${(size / 1024).toFixed(2)} KB` : `${size} B`;
-
-  const binaryBlob = new Blob([body], { type: contentType });
-  const binaryObjectUrl = URL.createObjectURL(binaryBlob);
+  const download = useDownload();
 
   return (
     <div className="flex items-center justify-between rounded-md w-full">
@@ -53,8 +73,11 @@ const _getDecodedBinaryBody = (
       </span>
       <span className="flex items-center justify-center">
         <p className="text-sm text-neutral-500">{sizeInHumanReadable}</p>
-        <a href={binaryObjectUrl} download={filename} className="ml-2">
-          <DownloadIcon className="size-4 text-neutral-500" />
+        <a
+          onClick={() => download(body, contentType, filename)}
+          className="ml-2 cursor-pointer"
+        >
+          <DownloadIcon className="size-4 text-neutral-500 hover:text-neutral-700" />
         </a>
       </span>
     </div>
