@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { SidePanel } from "@/components/Dashboard/SidePanel";
 import { RequestDetail } from "@/components/Dashboard/RequestDetail";
-import { getWebhookEvents } from "@/api";
+import { getWebhookEvents, archiveAllWebhookEventsByTokenID } from "@/api";
 import { useEffect } from "react";
 import { inHookContext } from "@/components/Dashboard/Dashboard";
 import type { IWebhookToken, IWebhookEvent } from "@/types/webhook";
@@ -38,6 +38,11 @@ export const RequestInfo = () => {
   const handleSelectEvent = (event: IWebhookEvent) => {
     setSelectedEvent(event);
   };
+  const handleArchiveAllEvents = () => {
+    archiveAllWebhookEventsByTokenID(webhookToken.id).then(() => {
+      setWebhookEvents([]);
+    });
+  };
 
   return (
     <div className="flex">
@@ -46,6 +51,7 @@ export const RequestInfo = () => {
         webhookEvents={webhookEvents}
         handleSelectEvent={handleSelectEvent}
         selectedEvent={selectedEvent}
+        handleArchiveAllEvents={handleArchiveAllEvents}
       />
       <RequestDetail className="w-3/4 px-4" selectedEvent={selectedEvent} />
     </div>

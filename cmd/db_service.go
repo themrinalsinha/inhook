@@ -163,3 +163,11 @@ func (s *DBService) MarkEventAsRead(eventId string) error {
 	}
 	return nil
 }
+
+func (s *DBService) DeleteAllEventsByTokenID(tokenId string) error {
+	_, err := s.db.Exec("DELETE FROM webhook_event WHERE token_id = ?", tokenId)
+	if err != nil {
+		return err
+	}
+	return nil
+}

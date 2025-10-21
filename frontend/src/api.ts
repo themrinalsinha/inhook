@@ -60,3 +60,11 @@ export const markEventAsRead = async (eventId: number) => {
   }
   return response.data;
 };
+
+export const archiveAllWebhookEventsByTokenID = async (tokenId: number) => {
+  const response = await api.post(`/api/webhook/${tokenId}/archive-events/`);
+  if (response.status !== 200) {
+    throw new Error("Failed to archive all webhook events");
+  }
+  return;
+};

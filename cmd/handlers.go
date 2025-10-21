@@ -246,6 +246,20 @@ func markEventAsReadHandler(app *App) http.HandlerFunc {
 	}
 }
 
+func deleteAllEventsByTokenIDHandler(app *App) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		app.lo.Info("Deleting all events by token ID")
+		tokenId := r.PathValue("token_id")
+		service := DBService{db: app.db}
+		err := service.DeleteAllEventsByTokenID(tokenId)
+		if err != nil {
+			http.Error(w, "Failed to delete all events by token ID", http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
 func getWebhookConfigHandler(app *App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		app.lo.Info("Getting webhook config")
@@ -266,6 +280,10 @@ func initHandlers(app *App) http.Handler {
 	handler.HandleFunc("DELETE /api/webhook/{token_id}", deleteWebhookTokenHandler(app))
 	handler.HandleFunc(
 		"GET /api/webhook/{token_id}/events/", getWebhookEventsHandler(app),
+	)
+	handler.HandleFunc(
+		"POST /api/webhook/{token_id}/archive-events/{$}",
+		deleteAllEventsByTokenIDHandler(app),
 	)
 	handler.HandleFunc("GET /api/webhook/config/{$}", getWebhookConfigHandler(app))
 	handler.HandleFunc(

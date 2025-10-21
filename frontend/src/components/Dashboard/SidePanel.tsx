@@ -3,17 +3,20 @@ import { Badge } from "@/components/ui/badge";
 import { RequestEventEmptyNode } from "@/components/Dashboard/RequestEventEmptyNode";
 import { RequestEventNode } from "@/components/Dashboard/RequestEventNode";
 import type { IWebhookEvent } from "@/types/webhook";
+import { Archive } from "lucide-react";
 
 export const SidePanel = ({
   className,
   webhookEvents,
   handleSelectEvent,
   selectedEvent,
+  handleArchiveAllEvents,
 }: {
   className?: string;
   webhookEvents: IWebhookEvent[];
   handleSelectEvent: (event: IWebhookEvent) => void;
   selectedEvent: IWebhookEvent | null;
+  handleArchiveAllEvents: () => void;
 }) => {
   return (
     <div className={className}>
@@ -22,9 +25,18 @@ export const SidePanel = ({
         {webhookEvents.length === 0 ? (
           ""
         ) : (
-          <Badge variant="outline" className="text-white bg-blue-thm">
-            Total Events - {webhookEvents.length}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-white bg-blue-thm">
+              Total Events: <b className="font-bold">{webhookEvents.length}</b>
+            </Badge>
+            <Archive
+              className={cn(
+                "size-4 text-neutral-500 hover:cursor-pointer hover:text-red-500",
+                "transition-colors duration-300"
+              )}
+              onClick={handleArchiveAllEvents}
+            />
+          </div>
         )}
       </div>
       <div
