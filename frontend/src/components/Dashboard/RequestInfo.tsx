@@ -7,8 +7,10 @@ import { inHookContext } from "@/components/Dashboard/Dashboard";
 import type { IWebhookToken, IWebhookEvent } from "@/types/webhook";
 
 export const RequestInfo = () => {
-  const { webhookToken } = useContext(inHookContext) as {
+  const { webhookToken, selectedEvent, setSelectedEvent } = useContext(inHookContext) as {
     webhookToken: IWebhookToken;
+    selectedEvent: IWebhookEvent | null;
+    setSelectedEvent: (event: IWebhookEvent | null) => void;
   };
 
   const [webhookEvents, setWebhookEvents] = useState<IWebhookEvent[]>([]);
@@ -32,15 +34,14 @@ export const RequestInfo = () => {
     return () => clearInterval(interval);
   }, [webhookToken?.token]);
 
-  const [selectedEvent, setSelectedEvent] = useState<IWebhookEvent | null>(
-    null
-  );
   const handleSelectEvent = (event: IWebhookEvent) => {
     setSelectedEvent(event);
   };
+
   const handleArchiveAllEvents = () => {
     archiveAllWebhookEventsByTokenID(webhookToken.id).then(() => {
       setWebhookEvents([]);
+      setSelectedEvent(null);
     });
   };
 

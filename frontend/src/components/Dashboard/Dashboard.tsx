@@ -4,7 +4,7 @@ import { NavBar } from "@/components/Dashboard/NavBar";
 import { HookEndpoint } from "@/components/Dashboard/HookEndpoint";
 import { cn } from "@/lib/utils";
 import { RequestInfo } from "@/components/Dashboard/RequestInfo";
-import type { IWebhookToken, IWebhookConfig } from "@/types/webhook";
+import type { IWebhookToken, IWebhookConfig, IWebhookEvent } from "@/types/webhook";
 import { createWebhookToken, getWebhookConfig } from "@/api";
 
 export const inHookContext = createContext({});
@@ -15,6 +15,9 @@ export const Dashboard = () => {
   );
   const [webhookConfig, setWebhookConfig] = useState<IWebhookConfig | undefined>(
     undefined
+  );
+  const [selectedEvent, setSelectedEvent] = useState<IWebhookEvent | null>(
+    null
   );
 
   useEffect(() => {
@@ -44,6 +47,8 @@ export const Dashboard = () => {
           webhookToken,
           setWebhookToken,
           webhookConfig,
+          selectedEvent,
+          setSelectedEvent,
         }}
       >
         <NavBar />

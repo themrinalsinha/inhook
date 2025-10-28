@@ -20,12 +20,13 @@ import { inHookContext } from "@/components/Dashboard/Dashboard";
 import type { IWebhookToken, IWebhookConfig } from "@/types/webhook";
 
 export const HookEndpoint = () => {
-  const { webhookToken, setWebhookToken, webhookConfig } = useContext(
+  const { webhookToken, setWebhookToken, webhookConfig, setSelectedEvent } = useContext(
     inHookContext
   ) as {
     webhookToken: IWebhookToken;
     setWebhookToken: (token: IWebhookToken) => void;
     webhookConfig: IWebhookConfig;
+    setSelectedEvent: (event: any) => void;
   };
   const [copied, setCopied] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -51,6 +52,7 @@ export const HookEndpoint = () => {
       setTimeout(() => {
         setIsRefreshing(false);
         setWebhookToken(newToken);
+        setSelectedEvent(null);
       }, 500);
       localStorage.setItem("webhook_object", JSON.stringify(newToken));
     } catch (err) {
