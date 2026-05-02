@@ -13,6 +13,7 @@ import {
   SquareArrowOutUpRight,
   Check,
   Link,
+  Share2,
 } from "lucide-react";
 
 import { refreshWebhookToken } from "@/api";
@@ -30,10 +31,25 @@ export const HookEndpoint = () => {
   };
   const [copied, setCopied] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
 
   const webhookUrl = `${
     webhookConfig?.host || import.meta.env.VITE_API_URL
   }/webhook/${webhookToken?.token}/`;
+
+  const shareUrl = `${
+    webhookConfig?.host || import.meta.env.VITE_API_URL
+  }/share/${webhookToken?.token}`;
+
+  const handleShareCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy share link: ", err);
+    }
+  };
 
   const handleCopy = async () => {
     try {
@@ -120,6 +136,15 @@ export const HookEndpoint = () => {
               <RefreshCcw />
             )}
             {isRefreshing ? "Refreshing Token" : "Refresh Token"}
+          </Button>
+          <Button
+            variant={"outline"}
+            size={"icon"}
+            className="hover:cursor-pointer"
+            onClick={handleShareCopy}
+            title="Copy share link"
+          >
+            {shareCopied ? <Check className="text-green-500" /> : <Share2 />}
           </Button>
         </div>
       </div>
