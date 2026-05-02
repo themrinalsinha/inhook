@@ -9,6 +9,32 @@ import { createWebhookToken, getWebhookConfig } from "@/api";
 
 export const inHookContext = createContext({});
 
+const WEBHOOK_STORAGE_KEY = "webhook_object";
+
+const readStoredWebhookToken = () => {
+  const tokenObject = localStorage.getItem(WEBHOOK_STORAGE_KEY);
+  if (!tokenObject) {
+    return undefined;
+  }
+
+  try {
+    const parsedToken = JSON.parse(tokenObject) as Partial<IWebhookToken>;
+    if (typeof parsedToken?.token !== "string" || parsedToken.token.trim() === "") {
+      localStorage.removeItem(WEBHOOK_STORAGE_KEY);
+      return undefined;
+    }
+
+    return {
+      id: typeof parsedToken.id === "number" ? parsedToken.id : 0,
+      token: parsedToken.token,
+      created_at: parsedToken.created_at ?? new Date(),
+    } as IWebhookToken;
+  } catch {
+    localStorage.removeItem(WEBHOOK_STORAGE_KEY);
+    return undefined;
+  }
+};
+
 export const Dashboard = () => {
   const [webhookToken, setWebhookToken] = useState<IWebhookToken | undefined>(
     undefined
@@ -23,22 +49,23 @@ export const Dashboard = () => {
   useEffect(() => {
     document.title = "InHook - Dashboard";
 
-    const tokenObject = localStorage.getItem("webhook_object");
-    if (tokenObject) {
-      setWebhookToken(JSON.parse(tokenObject));
-    } else {
-      createWebhookToken().then((token) => {
-        setWebhookToken(token);
-        localStorage.setItem("webhook_object", JSON.stringify(token));
-      });
+    const storedToken = readStoredWebhookToken();
+    if (storedToken) {
+      setWebhookToken(storedToken);
+      return;
     }
-  }, [localStorage.getItem("webhook_object")]);
+
+    createWebhookToken().then((token) => {
+      setWebhookToken(token);
+      localStorage.setItem(WEBHOOK_STORAGE_KEY, JSON.stringify(token));
+    });
+  }, []);
 
   useEffect(() => {
     getWebhookConfig().then((config) => {
       setWebhookConfig(config);
     });
-  }, [webhookConfig?.host]);
+  }, []);
 
   return (
     <Container className="h-screen mx-auto bg-neutral-100 p-5">

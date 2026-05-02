@@ -39,6 +39,10 @@ export const RequestInfo = () => {
   };
 
   const handleArchiveAllEvents = () => {
+    if (!webhookToken?.id) {
+      return;
+    }
+
     archiveAllWebhookEventsByTokenID(webhookToken.id).then(() => {
       setWebhookEvents([]);
       setSelectedEvent(null);
@@ -50,6 +54,7 @@ export const RequestInfo = () => {
       <SidePanel
         className="w-1/4 px-4 pr-0"
         webhookEvents={webhookEvents}
+        canArchiveAllEvents={Boolean(webhookToken?.id)}
         handleSelectEvent={handleSelectEvent}
         selectedEvent={selectedEvent}
         handleArchiveAllEvents={handleArchiveAllEvents}

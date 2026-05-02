@@ -8,12 +8,14 @@ import { Archive } from "lucide-react";
 export const SidePanel = ({
   className,
   webhookEvents,
+  canArchiveAllEvents,
   handleSelectEvent,
   selectedEvent,
   handleArchiveAllEvents,
 }: {
   className?: string;
   webhookEvents: IWebhookEvent[];
+  canArchiveAllEvents: boolean;
   handleSelectEvent: (event: IWebhookEvent) => void;
   selectedEvent: IWebhookEvent | null;
   handleArchiveAllEvents: () => void;
@@ -29,13 +31,15 @@ export const SidePanel = ({
             <Badge variant="outline" className="text-white bg-blue-thm">
               Total Events: <b className="font-bold">{webhookEvents.length}</b>
             </Badge>
-            <Archive
-              className={cn(
-                "size-4 text-neutral-500 hover:cursor-pointer hover:text-red-500",
-                "transition-colors duration-300"
-              )}
-              onClick={handleArchiveAllEvents}
-            />
+            {canArchiveAllEvents ? (
+              <Archive
+                className={cn(
+                  "size-4 text-neutral-500 hover:cursor-pointer hover:text-red-500",
+                  "transition-colors duration-300"
+                )}
+                onClick={handleArchiveAllEvents}
+              />
+            ) : null}
           </div>
         )}
       </div>
