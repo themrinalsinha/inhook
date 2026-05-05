@@ -9,6 +9,9 @@ BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 BIN := inhook
 
+BUILD_GOOS ?= $(shell go env GOOS)
+BUILD_GOARCH ?= $(shell go env GOARCH)
+
 FRONTEND_DIR := frontend
 FRONTEND_DIST := ${FRONTEND_DIR}/dist
 STATIC := ${FRONTEND_DIST}:/
@@ -29,14 +32,14 @@ $(STUFFBIN):
 	go install github.com/knadh/stuffbin/...
 
 $(BIN): $(shell find . -type f -name "*.go") go.mod go.sum
-	@CGO_ENABLED=0 go build -o ${BIN} \
+	@CGO_ENABLED=0 GOOS=$(BUILD_GOOS) GOARCH=$(BUILD_GOARCH) go build -o ${BIN} \
 		-ldflags="-s -w \
 		-X 'main.buildVersion=$(APP_VERSION)' \
 		-X 'main.buildHash=$(LAST_COMMIT_HASH_SHORT)' \
 		-X 'main.buildDate=$(BUILD_DATE)' \
 		-X 'main.buildHashFull=$(LAST_COMMIT_HASH_FULL)'" \
 		cmd/*.go
-	@echo "Built $(BIN) version $(APP_VERSION) with hash $(LAST_COMMIT_HASH_FULL)"
+	@echo "Built $(BIN) for $(BUILD_GOOS)/$(BUILD_GOARCH) version $(APP_VERSION) with hash $(LAST_COMMIT_HASH_FULL)"
 
 .PHONY: build-frontend
 build-frontend:
@@ -76,3 +79,7 @@ build:
 	@$(MAKE) build-backend
 	@$(MAKE) stuff
 	@echo "✅ Built $(BIN) version $(APP_VERSION) with hash $(LAST_COMMIT_HASH_FULL)"
+
+.PHONY: build-linux
+build-linux:
+	@$(MAKE) build BUILD_GOOS=linux BUILD_GOARCH=amd64
