@@ -2,14 +2,12 @@
   <img src="assets/inhook.png" align="center" width="200"/>
 </div>
 <hr/>
-<div align="center">
-  <a align="left" href="https://www.producthunt.com/products/inhook?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-inhook" target="_blank">
-    <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1028883&theme=light&t=1761055390831" alt="InHook - Webhook&#0032;inspector&#0032;&#0038;&#0032;debugger | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54"/>
-  </a>
-  <a align="right" href="https://peerlist.io/themrinalsinha/project/inhook--webhook-inspector--debugger" target="_blank" rel="noreferrer">
-	  <img src="https://peerlist.io/api/v1/projects/embed/PRJHQ7M9L9OE9GLNB1OLADN7MP7EOP?showUpvote=true&theme=light" alt="InHook - Webhook Inspector & Debugger" style="width: auto; height: 54px;"/>
-	</a>
-</div>
+<table align="center" border="0" cellspacing="0" cellpadding="10">
+  <tr>
+    <td align="center" border="0"><a href="https://www.producthunt.com/products/inhook?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-inhook" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1028883&theme=light&t=1761055390831" alt="InHook - Webhook inspector & debugger | Product Hunt" width="250" height="54"/></a></td>
+    <td align="center" border="0"><a href="https://peerlist.io/themrinalsinha/project/inhook--webhook-inspector--debugger" target="_blank" rel="noreferrer"><img src="https://peerlist.io/api/v1/projects/embed/PRJHQ7M9L9OE9GLNB1OLADN7MP7EOP?showUpvote=true&theme=light" alt="InHook - Webhook Inspector & Debugger" height="54"/></a></td>
+  </tr>
+</table>
 
 ----
 **Webhook Inspector & Debugger** -
