@@ -83,15 +83,3 @@ build:
 .PHONY: build-linux
 build-linux:
 	@$(MAKE) build BUILD_GOOS=linux BUILD_GOARCH=amd64
-
-.PHONY: build-darwin
-build-darwin:
-	@$(MAKE) build BUILD_GOOS=darwin BUILD_GOARCH=amd64
-
-.PHONY: build-darwin-arm64
-build-darwin-arm64:
-	@$(MAKE) build BUILD_GOOS=darwin BUILD_GOARCH=arm64
-
-.PHONY: build-linux-arm64
-build-linux-arm64:
-	@$(MAKE) build BUILD_GOOS=linux BUILD_GOARCH=arm64
