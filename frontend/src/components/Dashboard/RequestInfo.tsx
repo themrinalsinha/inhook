@@ -1,8 +1,8 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect } from "react";
 import { SidePanel } from "@/components/Dashboard/SidePanel";
 import { RequestDetail } from "@/components/Dashboard/RequestDetail";
-import { getWebhookEvents, archiveAllWebhookEventsByTokenID } from "@/api";
-import { useEffect } from "react";
+import { archiveAllWebhookEventsByTokenID } from "@/api";
+import { useWebhookEvents } from "@/hooks/useWebhookEvents";
 import { inHookContext } from "@/components/Dashboard/Dashboard";
 import type { IWebhookToken, IWebhookEvent } from "@/types/webhook";
 
@@ -13,26 +13,15 @@ export const RequestInfo = () => {
     setSelectedEvent: (event: IWebhookEvent | null) => void;
   };
 
-  const [webhookEvents, setWebhookEvents] = useState<IWebhookEvent[]>([]);
+  const { webhookEvents, setWebhookEvents } = useWebhookEvents(webhookToken?.token);
 
+  // Clear the selection when its event leaves the list — covers archives and
+  // token deletions made from other tabs or by other viewers of a shared token.
   useEffect(() => {
-    if (!webhookToken?.token) return;
-
-    // Initial fetch
-    getWebhookEvents(webhookToken.token).then((events) => {
-      setWebhookEvents(events);
-    });
-
-    // Polling interval
-    const interval = setInterval(() => {
-      getWebhookEvents(webhookToken.token).then((events) => {
-        setWebhookEvents(events);
-      });
-    }, 2000);
-
-    // Cleanup interval
-    return () => clearInterval(interval);
-  }, [webhookToken?.token]);
+    if (selectedEvent && !webhookEvents.some((event) => event.id === selectedEvent.id)) {
+      setSelectedEvent(null);
+    }
+  }, [webhookEvents, selectedEvent, setSelectedEvent]);
 
   const handleSelectEvent = (event: IWebhookEvent) => {
     setSelectedEvent(event);

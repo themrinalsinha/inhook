@@ -156,12 +156,21 @@ func (s *DBService) GetWebhookEventForRequestID(tokenId int64) ([]WebhookEvent, 
 	return events, nil
 }
 
-func (s *DBService) MarkEventAsRead(eventId string) error {
-	_, err := s.db.Exec("UPDATE webhook_event SET is_read = TRUE WHERE id = ?", eventId)
+// MarkEventAsRead flags the event and returns its token ID so the change can
+// be broadcast to that token's websocket clients.
+func (s *DBService) MarkEventAsRead(eventId string) (int64, error) {
+	var tokenID int64
+	err := s.db.Get(
+		&tokenID, "SELECT token_id FROM webhook_event WHERE id = ?", eventId,
+	)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	_, err = s.db.Exec("UPDATE webhook_event SET is_read = TRUE WHERE id = ?", eventId)
+	if err != nil {
+		return 0, err
+	}
+	return tokenID, nil
 }
 
 func (s *DBService) DeleteAllEventsByTokenID(tokenId string) error {
