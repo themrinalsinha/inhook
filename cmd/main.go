@@ -32,6 +32,7 @@ type App struct {
 	db            *sqlx.DB
 	fs            stuffbin.FileSystem
 	lo            *logf.Logger
+	hub           *Hub
 	buildVersion  string
 	buildHash     string
 	buildDate     string
@@ -68,6 +69,7 @@ func main() {
 		db:            db,
 		fs:            fs,
 		lo:            lo,
+		hub:           NewHub(),
 		buildVersion:  buildVersion,
 		buildHash:     buildHash,
 		buildDate:     buildDate,

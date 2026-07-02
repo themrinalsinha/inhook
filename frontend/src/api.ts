@@ -37,6 +37,13 @@ export const refreshWebhookToken = async (tokenId?: string) => {
   return response;
 };
 
+export const getWebhookEventsSocketURL = (tokenId: string) => {
+  const base = import.meta.env.VITE_API_URL || window.location.origin;
+  const url = new URL(`/api/webhook/${tokenId}/ws`, base);
+  url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
+  return url.toString();
+};
+
 export const getWebhookEvents = async (tokenId: string) => {
   const response = await api.get(`/api/webhook/${tokenId}/events/`);
   if (response.status !== 200) {
