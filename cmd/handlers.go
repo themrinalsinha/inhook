@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -92,11 +93,18 @@ func deleteWebhookTokenHandler(app *App) http.HandlerFunc {
 		app.lo.Info(fmt.Sprintf("Deleting webhook token: %s", token_id))
 
 		service := DBService{db: app.db}
-		err := service.DeleteWebhookToken(token_id)
+		// Look the token up first so viewers (e.g. of a shared token) can be
+		// notified after it is gone.
+		token, lookupErr := service.GetWebhookTokenByTokenID(token_id)
 
+		err := service.DeleteWebhookToken(token_id)
 		if err != nil {
 			http.Error(w, "Failed to delete webhook token", http.StatusInternalServerError)
 			return
+		}
+
+		if lookupErr == nil {
+			app.hub.Broadcast(token.ID, wsMessage{Type: "token_deleted"})
 		}
 		w.WriteHeader(http.StatusNoContent)
 	}
@@ -182,6 +190,11 @@ func webhookURLHandler(app *App) http.HandlerFunc {
 			)
 			return
 		}
+		app.hub.Broadcast(token.ID, wsMessage{
+			Type: "new_event",
+			Data: WebhookEventResponse(createdEvent),
+		})
+
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(
 			"Event created successfully with request ID: " + createdEvent.RequestID,
@@ -237,10 +250,17 @@ func markEventAsReadHandler(app *App) http.HandlerFunc {
 		app.lo.Info("Marking event as read")
 		eventId := r.PathValue("event_id")
 		service := DBService{db: app.db}
-		err := service.MarkEventAsRead(eventId)
+		tokenID, err := service.MarkEventAsRead(eventId)
 		if err != nil {
 			http.Error(w, "Failed to mark event as read", http.StatusInternalServerError)
 			return
+		}
+
+		if eventID, err := strconv.ParseInt(eventId, 10, 64); err == nil {
+			app.hub.Broadcast(tokenID, wsMessage{
+				Type: "event_read",
+				Data: map[string]int64{"id": eventID},
+			})
 		}
 		w.WriteHeader(http.StatusOK)
 	}
@@ -255,6 +275,10 @@ func deleteAllEventsByTokenIDHandler(app *App) http.HandlerFunc {
 		if err != nil {
 			http.Error(w, "Failed to delete all events by token ID", http.StatusInternalServerError)
 			return
+		}
+
+		if tokenID, err := strconv.ParseInt(tokenId, 10, 64); err == nil {
+			app.hub.Broadcast(tokenID, wsMessage{Type: "events_archived"})
 		}
 		w.WriteHeader(http.StatusOK)
 	}
@@ -286,6 +310,7 @@ func initHandlers(app *App) http.Handler {
 		deleteAllEventsByTokenIDHandler(app),
 	)
 	handler.HandleFunc("GET /api/webhook/config/{$}", getWebhookConfigHandler(app))
+	handler.HandleFunc("GET /api/webhook/{token_id}/ws", wsHandler(app))
 	handler.HandleFunc(
 		"POST /api/webhook/event/{event_id}/read/", markEventAsReadHandler(app),
 	)

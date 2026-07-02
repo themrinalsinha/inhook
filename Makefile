@@ -58,7 +58,7 @@ run:
 		-X 'main.buildHash=$(LAST_COMMIT_HASH_SHORT)' \
 		-X 'main.buildDate=$(BUILD_DATE)' \
 		-X 'main.buildHashFull=$(LAST_COMMIT_HASH_FULL)'" \
-		cmd/*.go
+		./cmd
 	@echo "✅ Running $(BIN) version $(APP_VERSION)"
 
 .PHONY: run-frontend
