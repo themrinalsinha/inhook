@@ -83,3 +83,23 @@ build:
 .PHONY: build-linux
 build-linux:
 	@$(MAKE) build BUILD_GOOS=linux BUILD_GOARCH=amd64
+
+DIST_DIR := dist
+
+.PHONY: dist
+dist:
+	@$(MAKE) build-frontend
+	@mkdir -p $(DIST_DIR)
+	@$(MAKE) dist-package BUILD_GOOS=darwin BUILD_GOARCH=arm64
+	@$(MAKE) dist-package BUILD_GOOS=linux BUILD_GOARCH=amd64
+	@cd $(DIST_DIR) && shasum -a 256 *.tar.gz > checksums.txt
+	@echo "✅ Built release archives in $(DIST_DIR)/"
+
+# $(BIN) is a file target, so a leftover binary from a previous build would make
+# the compile for the next OS/arch silently skip — remove it before and after.
+.PHONY: dist-package
+dist-package:
+	@rm -f $(BIN)
+	@$(MAKE) build-backend stuff BUILD_GOOS=$(BUILD_GOOS) BUILD_GOARCH=$(BUILD_GOARCH)
+	@tar -czf $(DIST_DIR)/$(BIN)_$(BASE_VERSION)_$(BUILD_GOOS)_$(BUILD_GOARCH).tar.gz $(BIN)
+	@rm -f $(BIN)
