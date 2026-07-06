@@ -18,24 +18,39 @@ import {
 
 import { refreshWebhookToken } from "@/api";
 import { inHookContext } from "@/components/Dashboard/Dashboard";
-import type { IWebhookToken, IWebhookConfig } from "@/types/webhook";
+import { TunnelToggle } from "@/components/Dashboard/TunnelToggle";
+import type {
+  IWebhookToken,
+  IWebhookConfig,
+  ITunnelStatus,
+} from "@/types/webhook";
 
 export const HookEndpoint = () => {
-  const { webhookToken, setWebhookToken, webhookConfig, setSelectedEvent } = useContext(
-    inHookContext
-  ) as {
+  const {
+    webhookToken,
+    setWebhookToken,
+    webhookConfig,
+    setSelectedEvent,
+    tunnelStatus,
+  } = useContext(inHookContext) as {
     webhookToken: IWebhookToken;
     setWebhookToken: (token: IWebhookToken) => void;
     webhookConfig: IWebhookConfig;
     setSelectedEvent: (event: any) => void;
+    tunnelStatus?: ITunnelStatus;
   };
   const [copied, setCopied] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
 
-  const webhookUrl = `${
-    webhookConfig?.host || import.meta.env.VITE_API_URL
-  }/webhook/${webhookToken?.token}/`;
+  // When the tunnel is up, hand out the public URL; the share URL stays on
+  // the local host because only /webhook/ paths are exposed publicly.
+  const displayHost =
+    tunnelStatus?.state === "connected" && tunnelStatus.public_host
+      ? tunnelStatus.public_host
+      : webhookConfig?.host || import.meta.env.VITE_API_URL;
+
+  const webhookUrl = `${displayHost}/webhook/${webhookToken?.token}/`;
 
   const shareUrl = `${
     webhookConfig?.host || import.meta.env.VITE_API_URL
@@ -112,6 +127,7 @@ export const HookEndpoint = () => {
         </InputGroup>
 
         <div className="flex md:flex-row items-center gap-2 text-neutral-700">
+          <TunnelToggle />
           <Button
             className="hover:cursor-pointer"
             variant={"outline"}

@@ -1,0 +1,14 @@
+[Unit]
+Description=frps tunnel server for inhook
+After=network.target
+Wants=network-online.target
+
+[Service]
+User=frp
+Group=frp
+ExecStart=/usr/local/bin/frps -c /etc/frp/frps.toml
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

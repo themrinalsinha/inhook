@@ -1,0 +1,39 @@
+# frps configuration for the inhook public tunnel server.
+#
+# IMPORTANT: the frps release version must match the frp client library pinned
+# in inhook's go.mod (currently v0.69.1) - frp makes no compatibility promises
+# before 1.0.
+
+# Public: inhook clients connect here (tunnel.server_addr / server_port).
+bindPort = 9090
+
+# The vhost listener serves the tunneled HTTP traffic. It binds to loopback
+# only; nginx terminates TLS for *.t.inhook.mrinal.xyz and proxies to it
+# (see nginx.conf).
+proxyBindAddr = "127.0.0.1"
+vhostHTTPPort = 8080
+
+# Wildcard vhost domain: clients get <slug>.t.inhook.mrinal.xyz.
+subDomainHost = "t.inhook.mrinal.xyz"
+
+# Must match tunnel.auth_token shipped in inhook's config defaults. This value
+# is public by design (it ships with the open-source client); the settings
+# below contain what a client can do with it.
+auth.method = "token"
+auth.token = "inhook-public-tunnel"
+
+# Containment: no usable TCP/UDP remotePort proxies (port 1 cannot be bound by
+# the unprivileged frps user, and the proxy listener is loopback-only anyway),
+# and a single proxy per client.
+allowPorts = [
+  { single = 1 },
+]
+maxPortsPerClient = 1
+
+# Required: inhook detects a taken subdomain by matching the
+# "router config conflict" error frps sends back, and picks a new one.
+detailedErrorsToClient = true
+
+log.to = "/var/log/frp/frps.log"
+log.level = "info"
+log.maxDays = 7

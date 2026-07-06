@@ -4,8 +4,13 @@ import { NavBar } from "@/components/Dashboard/NavBar";
 import { HookEndpoint } from "@/components/Dashboard/HookEndpoint";
 import { cn } from "@/lib/utils";
 import { RequestInfo } from "@/components/Dashboard/RequestInfo";
-import type { IWebhookToken, IWebhookConfig, IWebhookEvent } from "@/types/webhook";
-import { createWebhookToken, getWebhookConfig } from "@/api";
+import type {
+  IWebhookToken,
+  IWebhookConfig,
+  IWebhookEvent,
+  ITunnelStatus,
+} from "@/types/webhook";
+import { createWebhookToken, getWebhookConfig, getTunnelStatus } from "@/api";
 
 export const inHookContext = createContext({});
 
@@ -45,6 +50,9 @@ export const Dashboard = () => {
   const [selectedEvent, setSelectedEvent] = useState<IWebhookEvent | null>(
     null
   );
+  const [tunnelStatus, setTunnelStatus] = useState<ITunnelStatus | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     document.title = "InHook - Dashboard";
@@ -65,6 +73,9 @@ export const Dashboard = () => {
     getWebhookConfig().then((config) => {
       setWebhookConfig(config);
     });
+    getTunnelStatus()
+      .then(setTunnelStatus)
+      .catch(() => {});
   }, []);
 
   return (
@@ -76,6 +87,8 @@ export const Dashboard = () => {
           webhookConfig,
           selectedEvent,
           setSelectedEvent,
+          tunnelStatus,
+          setTunnelStatus,
         }}
       >
         <NavBar />

@@ -61,6 +61,24 @@ run:
 		./cmd
 	@echo "✅ Running $(BIN) version $(APP_VERSION)"
 
+# Local frps matching the client library pinned in go.mod; used to verify the
+# tunnel end-to-end without deploying anything (see deploy/tunnel/). frps is
+# not `go run`-able (its go.mod has replace directives and its web assets are
+# not in the module zip), so the official release binary is downloaded once
+# into the git-ignored .frp/ directory.
+FRP_VERSION := 0.69.1
+FRP_DIST := frp_$(FRP_VERSION)_$(shell go env GOOS)_$(shell go env GOARCH)
+FRPS_BIN := .frp/$(FRP_DIST)/frps
+
+$(FRPS_BIN):
+	@mkdir -p .frp
+	@curl -fsSL https://github.com/fatedier/frp/releases/download/v$(FRP_VERSION)/$(FRP_DIST).tar.gz | tar -xz -C .frp
+	@echo "✅ Downloaded frps v$(FRP_VERSION) to $(FRPS_BIN)"
+
+.PHONY: dev-frps
+dev-frps: $(FRPS_BIN)
+	$(FRPS_BIN) -c deploy/tunnel/frps.dev.toml
+
 .PHONY: run-frontend
 run-frontend:
 	@cd ${FRONTEND_DIR} && pnpm install

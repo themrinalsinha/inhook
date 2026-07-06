@@ -25,3 +25,12 @@ export interface IWebhookConfig {
   version: string;
   host: string;
 }
+
+export type TunnelState = "disabled" | "connecting" | "connected" | "error";
+
+export interface ITunnelStatus {
+  state: TunnelState;
+  public_host?: string;
+  error?: string;
+  server?: string;
+}

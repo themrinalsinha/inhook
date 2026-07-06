@@ -3,6 +3,7 @@ import type {
   IWebhookToken,
   IWebhookEvent,
   IWebhookConfig,
+  ITunnelStatus,
 } from "@/types/webhook";
 
 const api = axios.create({
@@ -58,6 +59,30 @@ export const getWebhookConfig = async () => {
     throw new Error("Failed to get webhook config");
   }
   return response.data as IWebhookConfig;
+};
+
+export const getTunnelStatus = async () => {
+  const response = await api.get("/api/tunnel/status/");
+  if (response.status !== 200) {
+    throw new Error("Failed to get tunnel status");
+  }
+  return response.data as ITunnelStatus;
+};
+
+export const startTunnel = async () => {
+  const response = await api.post("/api/tunnel/start/");
+  if (response.status !== 200) {
+    throw new Error("Failed to start tunnel");
+  }
+  return response.data as ITunnelStatus;
+};
+
+export const stopTunnel = async () => {
+  const response = await api.post("/api/tunnel/stop/");
+  if (response.status !== 200) {
+    throw new Error("Failed to stop tunnel");
+  }
+  return response.data as ITunnelStatus;
 };
 
 export const markEventAsRead = async (eventId: number) => {

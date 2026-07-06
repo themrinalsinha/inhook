@@ -1,0 +1,19 @@
+# Local frps for developing/verifying the tunnel without deploying anything.
+# Run it with: make dev-frps
+#
+# Point inhook at it via config.toml:
+#   [tunnel]
+#   server_addr = "127.0.0.1"
+#   server_port = 9090
+#   auth_token = "dev-token"
+#   domain = "t.localhost"
+#   scheme = "http"
+#
+# Then exercise the vhost with a Host header (no DNS needed):
+#   curl -H "Host: <slug>.t.localhost" http://127.0.0.1:8080/webhook/<token>/ -d test=1
+bindPort = 9090
+vhostHTTPPort = 8080
+subDomainHost = "t.localhost"
+auth.method = "token"
+auth.token = "dev-token"
+detailedErrorsToClient = true

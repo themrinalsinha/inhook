@@ -6,33 +6,16 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/coder/websocket"
-	"github.com/jmoiron/sqlx"
 )
 
 func newTestServer(t *testing.T) *httptest.Server {
 	t.Helper()
-
-	db, err := sqlx.Open("sqlite", filepath.Join(t.TempDir(), "test.db"))
-	if err != nil {
-		t.Fatalf("failed to open test db: %v", err)
-	}
-	t.Cleanup(func() { db.Close() })
-	initMigrations(db)
-
-	app := &App{
-		db:  db,
-		lo:  initLogger("test"),
-		hub: NewHub(),
-	}
-	server := httptest.NewServer(initHandlers(app))
-	t.Cleanup(server.Close)
-	return server
+	return newTestServerWithTunnel(t, &fakeTunnel{})
 }
 
 func createTestToken(t *testing.T, server *httptest.Server) WebhookTokenResponse {

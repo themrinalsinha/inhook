@@ -9,6 +9,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/knadh/koanf/parsers/toml"
+	"github.com/knadh/koanf/providers/confmap"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/providers/posflag"
 	"github.com/knadh/koanf/v2"
@@ -20,6 +21,18 @@ import (
 
 // initConfig loads the config files into the koanf instance
 func initConfig(ko *koanf.Koanf) {
+	// Defaults for optional sections; config files override them.
+	if err := ko.Load(confmap.Provider(map[string]interface{}{
+		"tunnel.enabled":     false,
+		"tunnel.server_addr": "t.inhook.mrinal.xyz",
+		"tunnel.server_port": 9090,
+		"tunnel.auth_token":  "inhook-public-tunnel",
+		"tunnel.domain":      "t.inhook.mrinal.xyz",
+		"tunnel.scheme":      "https",
+	}, "."), nil); err != nil {
+		log.Fatalf("Error loading config defaults: %v", err)
+	}
+
 	for _, f := range ko.Strings("config") {
 		log.Println("Loading config file(s)")
 		if err := ko.Load(file.Provider(f), toml.Parser()); err != nil {
@@ -142,6 +155,12 @@ func initMigrations(db *sqlx.DB) {
 		);`,
 		// index to speed up the queries
 		`CREATE INDEX IF NOT EXISTS idx_webhook_events_token_id ON webhook_event(token_id, created_at DESC);`,
+		// table to store the app settings (e.g. the tunnel subdomain)
+		`CREATE TABLE IF NOT EXISTS app_setting (
+			key TEXT PRIMARY KEY,
+			value TEXT NOT NULL,
+			updated_at DATETIME NOT NULL DEFAULT current_timestamp
+		);`,
 	}
 
 	for _, migration := range migrations {
