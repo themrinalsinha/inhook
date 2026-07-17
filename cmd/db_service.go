@@ -173,6 +173,27 @@ func (s *DBService) MarkEventAsRead(eventId string) (int64, error) {
 	return tokenID, nil
 }
 
+func (s *DBService) GetSetting(key string) (string, error) {
+	var value string
+	err := s.db.Get(&value, "SELECT value FROM app_setting WHERE key = ?", key)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return "", nil
+		}
+		return "", err
+	}
+	return value, nil
+}
+
+func (s *DBService) SetSetting(key, value string) error {
+	_, err := s.db.Exec(
+		`INSERT INTO app_setting (key, value) VALUES (?, ?)
+		ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = current_timestamp`,
+		key, value,
+	)
+	return err
+}
+
 func (s *DBService) DeleteAllEventsByTokenID(tokenId string) error {
 	_, err := s.db.Exec("DELETE FROM webhook_event WHERE token_id = ?", tokenId)
 	if err != nil {

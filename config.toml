@@ -10,3 +10,15 @@ name = "inhook.db"
 max_open_conns = 1
 max_idle_conns = 1
 conn_max_lifetime = 3600
+
+# Expose your local instance publicly with the built-in tunnel. Toggle it from
+# the dashboard, or set enabled = true to start it with the app. The defaults
+# point at the official inhook tunnel server; self-hosters can run their own
+# frps (see deploy/tunnel/).
+# [tunnel]
+# enabled = false
+# server_addr = "t.inhook.mrinal.xyz"
+# server_port = 9090
+# auth_token = "inhook-public-tunnel"
+# domain = "t.inhook.mrinal.xyz"
+# scheme = "https"

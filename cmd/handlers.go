@@ -311,6 +311,9 @@ func initHandlers(app *App) http.Handler {
 	)
 	handler.HandleFunc("GET /api/webhook/config/{$}", getWebhookConfigHandler(app))
 	handler.HandleFunc("GET /api/webhook/{token_id}/ws", wsHandler(app))
+	handler.HandleFunc("GET /api/tunnel/status/{$}", tunnelStatusHandler(app))
+	handler.HandleFunc("POST /api/tunnel/start/{$}", tunnelStartHandler(app))
+	handler.HandleFunc("POST /api/tunnel/stop/{$}", tunnelStopHandler(app))
 	handler.HandleFunc(
 		"POST /api/webhook/event/{event_id}/read/", markEventAsReadHandler(app),
 	)

@@ -46,6 +46,24 @@ To run the binary with custom config, you can pass the config file as an argumen
 ### Docker
 TBD
 
+## Local Tunneling
+
+Running locally but need Stripe/GitHub/etc. to reach you? InHook has a built-in
+tunnel, powered by an embedded [frp](https://github.com/fatedier/frp) client.
+Click **Expose Online** in the dashboard and your webhook URL switches to a
+public address like `https://<id>.t.inhook.mrinal.xyz/webhook/<token>/` —
+requests to it are captured straight into your local instance.
+
+- Only the webhook ingestion path (`/webhook/...`) is exposed publicly. The
+  dashboard, API, and captured data stay on your machine.
+- Your subdomain is remembered, so the public URL is stable across restarts.
+- To start the tunnel with the app, or to point it at your own tunnel server,
+  see the `[tunnel]` section in `config.toml`. A guide for self-hosting the
+  tunnel server (frps) lives in [deploy/tunnel/](deploy/tunnel/).
+
+InHook bundles the frp client library, licensed under the
+[Apache License 2.0](https://github.com/fatedier/frp/blob/dev/LICENSE).
+
 ### License
 inHook is licensed under the [MIT](LICENSE.md) license.
 

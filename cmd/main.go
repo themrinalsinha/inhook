@@ -14,6 +14,8 @@ import (
 	"github.com/knadh/koanf/v2"
 	"github.com/knadh/stuffbin"
 	"github.com/zerodha/logf"
+
+	"github.com/themrinalsinha/inhook/internal/tunnel"
 )
 
 var (
@@ -33,6 +35,7 @@ type App struct {
 	fs            stuffbin.FileSystem
 	lo            *logf.Logger
 	hub           *Hub
+	tunnel        tunnelController
 	buildVersion  string
 	buildHash     string
 	buildDate     string
@@ -65,15 +68,37 @@ func main() {
 	// Initialize the logger
 	lo := initLogger(appName)
 
+	// Initialize the tunnel manager (started on demand, or at boot when
+	// tunnel.enabled is set)
+	localPort, err := localPortFromAddr(ko.String("app.port"))
+	if err != nil {
+		log.Fatalf("Error parsing app.port %q: %v", ko.String("app.port"), err)
+	}
+	tm := tunnel.NewManager(tunnel.Config{
+		ServerAddr: ko.String("tunnel.server_addr"),
+		ServerPort: ko.Int("tunnel.server_port"),
+		AuthToken:  ko.String("tunnel.auth_token"),
+		Domain:     ko.String("tunnel.domain"),
+		Scheme:     ko.String("tunnel.scheme"),
+		LocalPort:  localPort,
+	}, tunnelSlugStore{svc: DBService{db: db}}, lo)
+
 	var app = &App{
 		db:            db,
 		fs:            fs,
 		lo:            lo,
 		hub:           NewHub(),
+		tunnel:        tm,
 		buildVersion:  buildVersion,
 		buildHash:     buildHash,
 		buildDate:     buildDate,
 		buildHashFull: buildHashFull,
+	}
+
+	if ko.Bool("tunnel.enabled") {
+		// Boot autostart retries quietly until the tunnel server is
+		// reachable; errors are logged by the manager itself.
+		go tm.Start(false)
 	}
 
 	// initiate net/http and pass app as context
@@ -107,6 +132,9 @@ func main() {
 	} else {
 		log.Println("\033[32mServer stopped gracefully\033[0m")
 	}
+
+	// Stop the tunnel, if running
+	tm.Shutdown(ctx)
 
 	// Close the database connection
 	if err := db.Close(); err != nil {
