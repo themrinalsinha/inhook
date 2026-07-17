@@ -39,15 +39,31 @@ compatibility promises between client and server versions.
    ```
 
 3. **Wildcard TLS certificate** — most webhook providers require HTTPS.
-   Wildcard certs need the DNS-01 challenge:
+   Wildcard certs only work with the DNS-01 challenge; certbot's
+   nginx/standalone/webroot plugins are HTTP-01-only and will dead-end with
+   "none of the preferred challenges are supported". Unless your DNS provider
+   has a certbot plugin, use the manual flow:
 
    ```sh
-   certbot certonly --preferred-challenges dns \
+   certbot certonly --manual --preferred-challenges dns \
      -d 't.inhook.mrinal.xyz' -d '*.t.inhook.mrinal.xyz'
    ```
 
-   Use a certbot DNS plugin for your DNS provider so renewals stay automatic
-   (`--manual` works but cannot auto-renew).
+   Certbot prints two TXT values (one per `-d`), both for the record name
+   `_acme-challenge.t.inhook.mrinal.xyz`. Add BOTH as separate TXT records at
+   your DNS host (on Namecheap: Advanced DNS → TXT record, Host
+   `_acme-challenge.t.inhook`, TTL 1 min) and confirm propagation before
+   letting certbot continue:
+
+   ```sh
+   dig TXT _acme-challenge.t.inhook.mrinal.xyz +short   # must show both values
+   ```
+
+   Renewal caveat: `certbot renew` does NOT renew `--manual` certs — re-run
+   the command every ~60-90 days, or automate by moving the zone to a
+   provider with a certbot DNS plugin (e.g. Cloudflare free tier +
+   `certbot-dns-cloudflare`), or by CNAME-delegating `_acme-challenge.t.inhook`
+   to an API-enabled zone (acme-dns).
 
 4. **nginx** — copy `nginx.conf` into your nginx config (e.g.
    `/etc/nginx/conf.d/inhook-tunnel.conf`) and reload. It terminates TLS for
